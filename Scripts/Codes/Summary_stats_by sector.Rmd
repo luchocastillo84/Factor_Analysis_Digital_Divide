@@ -1,0 +1,358 @@
+---
+title: "Summary Statistics Sectoral Level"
+author: "Luis Carlos Castillo"
+date: "`r Sys.Date()`"
+header-includes:
+- \usepackage{booktabs}
+- \usepackage{longtable}
+output:
+  beamer_presentation: default
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE}
+#### 0. Load the necessary packages #####
+library(readr)
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(here)
+library(git2r)
+library(visdat)
+library(naniar)
+library(chatgpt)
+library(gptstudio)
+require(devtools)
+library(caret)
+library(mice)
+library(knitr)
+library(kableExtra)
+
+knitr::opts_chunk$set(echo = FALSE, warning = F, message = F )
+kableExtra.auto_format = FALSE
+knitr.table.format = "latex"
+knitr::opts_knit$set(kable.force.latex = TRUE)
+
+```
+
+```{r loading_data, echo = FALSE}
+
+load(here("Data", "Processed", "ICT_Combined.rda"))
+
+
+```
+
+## Economic Sectors
+
+In the analysis of ICT usage in enterprises, the classification of economic sectors adhered to the ATECO 2007 standards set by ISTAT, the Italian National Institute of Statistics. Initially, for 2014 and 2015, data collection followed 27 distinct sector groupings as detailed in the ATECO 2007 classification. Subsequently, to streamline data analysis and improve reporting efficiency, these groupings were condensed into 11 broader categories. Further refining the categorization, these 11 groupings have now been reorganized into four major groups: Industrial, Commercial, Service, Creative Industries and ICT. This restructuring facilitates a more uniform analysis across different years, enabling a comprehensive view of ICT usage trends across Italy's economic sectors.
+
+## Grouping of 11 Sectors
+
+```{r econ_sectors, echo=FALSE}
+# Assuming `ict_combined` is your data frame
+sectors <- ict_combined %>%
+  distinct(ateco) %>%
+  arrange(ateco) %>%
+  mutate(sector = case_when(
+    ateco == "C" ~ "Manufacturing",
+    ateco == "D_E" ~ "Energy & Water Treatment",
+    ateco == "F" ~ "Construction",
+    ateco == "G" ~ "Wholesale Retail",
+    ateco == "H" ~ "Transport",
+    ateco == "I" ~ "Accommodation",
+    ateco == "J" ~ "Media & ICT",
+    ateco == "L" ~ "Real Estate",
+    ateco == "M" ~ "Professional, scientific and technical activities ",
+    ateco == "N" ~ "Rental & Travel",
+    ateco == "S" ~ "Repair computers and communications",
+    TRUE ~ "Other"  # Default case if none of the above match
+  ))
+
+rownames(sectors) <- NULL
+
+kable(sectors,  "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,11)
+
+
+```
+
+## Count of Firms by Sector by year
+
+```{r sectors_by_year, echo=FALSE}
+
+
+
+# Summarize the data to count companies per sector and year
+ict_summary <- ict_combined %>%
+  group_by(sec_name, year) %>%
+  summarise(count = n(), .groups = 'drop')
+
+
+# Pivot the data to wide format
+ict_wide <- ict_summary %>%
+  pivot_wider(
+    names_from = year,              # Define new column names from 'year'
+    values_from = count,            # Fill the new columns with values from 'count'
+    values_fill = list(count = 0))   # Fill missing values with 0
+
+kable(ict_wide, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,11)
+
+```
+
+## Percentage of Firms by Sectors by Year
+
+```{r sec_props, echo=FALSE}
+
+
+# Calculate total companies per year for normalization
+year_totals <- ict_combined %>%
+  group_by(year) %>%
+  summarise(total_firms = n(), .groups = 'drop')
+
+
+# Join the totals back to the summary data
+ict_summary <- left_join(ict_summary, year_totals, by = "year")
+
+# Calculate proportions
+ict_summary <- ict_summary %>%
+  mutate(proportion = round(count / total_firms * 100,2))
+
+
+ict_summary1 <- ict_summary %>%
+  mutate(proportion = round(count / total_firms * 100,2)) %>%
+  dplyr::select(sec_name, year, proportion)  # Select only the columns needed for pivoting
+
+ict_wide_prop <- ict_summary1 %>%
+  pivot_wider(
+    names_from = year,              # Define new column names from 'year'
+    values_from = proportion,       # Fill the new columns with values from 'proportion'
+    values_fill = list(proportion = 0))  # Fill missing values with 0
+
+
+# Use kable to format the wide table for LaTeX
+kable(ict_wide_prop, "latex", longtable = F, booktabs = TRUE, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%
+  pack_rows("", 1, 11)
+
+```
+
+## Manufacturing
+
+```{r Manufacturing1, echo=FALSE}
+
+options(scipen=999)
+
+manuf_data <- ict_summary %>% 
+  dplyr::filter(sec_name == "Manufacturing") 
+
+  
+```
+
+In the database, the manufacturing sector is designated by the code 'C' and includes subgroups ranging from 10 to 33, as defined by the ATECO classification. Manufacturing is prominently represented in the sample, averaging **`r round(mean(manuf_data$count), 2)`** firms per year. The average proportion of firms within this sector is **`r round(mean(manuf_data$proportion), 2)`%**, with a standard deviation of **`r round(sd(manuf_data$proportion), 2)`%** over the years.
+
+```{r Manufacturing, echo=FALSE}
+
+
+
+kable(manuf_data, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+
+```
+
+## Supply of Energy, Water and Water Treatments
+
+```{r Energy_&_WT1, echo=FALSE}
+energy_data <- ict_summary %>% 
+  dplyr::filter(sec_name == "Energy & WT")
+```
+
+In the sample, the sectors for the supply of energy, water, and water treatments are collectively categorized under the codes "D" and "E". Sector D, represented by subgroup 35, is responsible for the supply of electric energy, gas, steam, and air conditioning. Sector E, denoted by subgroup 39, manages water supply and sewerage treatment. On average, this combined sector includes **`r round(mean(energy_data$count), 2)`** firms per year. The proportion of firms within this sector averages **`r round(mean(energy_data$proportion), 2)`%**, with a standard deviation of **`r round(sd(energy_data$proportion), 2)`%** across the years.
+
+```{r Energy_&_WT, echo=FALSE}
+
+# Display the table
+kable(energy_data, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))%>%   
+  pack_rows("",1,6)
+
+```
+
+## Construction
+
+```{r Constructions1, echo=FALSE}
+
+construction_data <- ict_summary %>% 
+  filter(sec_name == "Construction")
+
+```
+
+In the sample, the construction sector, designated by the code "F" and including subgroups 41 to 43, consistently features **`r round(mean(construction_data$count), 2)`** firms each year on average. The proportion of firms within this sector averages **`r round(mean(construction_data$proportion), 2)`%**, with a standard deviation of **`r round(sd(construction_data$proportion), 2)`%** over the years.
+
+```{r Constructions, echo= F}
+construction_data <- ict_summary %>% 
+  filter(sec_name == "Construction")
+
+# Display the table
+kable(construction_data, "latex", longtable = F, booktabs = TRUE, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = "repeat_header")%>%   
+  pack_rows("",1,6)
+```
+
+## Wholesale Retail
+
+```{r Wholesale_Retail1, echo=F}
+wholesale_data <- ict_summary %>% 
+  filter(sec_name == "Wholesale Retail")
+
+```
+
+In the sample, the Wholesale and Retail sector, coded with the letter "G" and encompassing subgroups 45 to 47, has the highest representation. This sector averages **`r round(mean(wholesale_data$count), 2)`** firms per year, making up an average of **`r round(mean(wholesale_data$proportion), 2)`%** per year, the highest percentage among all sectors. The variability in firm proportions annually is captured by a standard deviation of **`r round(sd(wholesale_data$proportion), 2)`%**.
+
+```{r Wholesale_Retail, echo= F}
+# Display the table
+kable(wholesale_data, "latex", longtable = F, booktabs = TRUE, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = "repeat_header")%>%   
+  pack_rows("",1,6)
+
+```
+
+## Transport
+
+```{r Transport1, echo=F}
+transport_data <- ict_summary %>% 
+  filter(sec_name == "Transport")
+
+```
+
+In the sample, the transport sector, coded with the letter "H" and spanning subgroups 49 to 53, consistently includes an average of **`r round(mean(transport_data$count), 2)`** firms per year. The proportion of firms within this sector typically averages **`r round(mean(transport_data$proportion), 2)`%**, with a standard deviation of **`r round(sd(transport_data$proportion), 2)`%** across the years.
+
+```{r Transport, echo= F}
+# Display the table
+kable(transport_data, "latex", longtable = F, booktabs = TRUE, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = "repeat_header") %>%   
+  pack_rows("",1,6)
+
+```
+
+## Accommodation
+
+```{r Accommodation1, echo=F}
+accommodation_data <- ict_summary %>% 
+  filter(sec_name == "Accommodation")
+```
+
+In the sample, the Accommodation sector, coded with the letter "I" and encompassing subgroups 53 to 55, consistently includes **`r round(mean(accommodation_data$count), 2)`** firms per year on average. This sector, which covers lodging and catering services, typically accounts for **`r round(mean(accommodation_data$proportion), 2)`%** of the total sample, with a standard deviation of **`r round(sd(accommodation_data$proportion), 2)`%** across the years.
+
+```{r Accommodation, echo= F}
+
+# Display the table
+kable(accommodation_data, "latex", longtable = F, booktabs = TRUE, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = "repeat_header") %>%   
+  pack_rows("",1,6)
+
+```
+
+## Media & Telecom
+
+```{r Media_&_Telecom1, echo=F}
+
+ media_ict_data <- ict_summary %>% 
+  filter(sec_name == "Media & Telecom")
+
+```
+
+In the sample, the Media and Telecom sector, coded with the letter "J" and spanning subgroups 58 to 63, consistently includes **`r round(mean(media_ict_data$count), 2)`** firms per year on average. This sector comprises a range of activities including publishing, film and video production, telecommunications, and other information services. It typically accounts for **`r round(mean(media_ict_data$proportion), 2)`%** of the total sample, with a standard deviation of **`r round(sd(media_ict_data$proportion), 2)`%** across the years.
+
+```{r Media_&_Telecom, echo=FALSE}
+
+# Display the table
+kable(media_ict_data, "latex", longtable = F, booktabs = TRUE, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = "repeat_header") %>%   
+  pack_rows("",1,6)
+
+```
+
+## Real Estate
+
+```{r Real_Estate1, echo=FALSE}
+real_estate_data <- ict_summary %>% 
+  filter(sec_name == "Real Estate")
+```
+
+In the sample, the Real Estate sector, coded with the letter "L" and specifically encompassing subgroup 68, consistently includes **`r round(mean(real_estate_data$count), 2)`** firms per year on average. It typically accounts for **`r round(mean(real_estate_data$proportion), 2)`%** of the total sample, with a standard deviation of **`r round(sd(real_estate_data$proportion), 2)`%** across the years.
+
+```{r Real_Estate, echo=FALSE}
+
+# Display the table
+kable(real_estate_data, "latex", longtable = F, booktabs = TRUE, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = "repeat_header") %>%   
+  pack_rows("",1,6)
+
+
+```
+
+## Professional, scientific and technic activities
+
+```{r Prof_science1, echo=FALSE}
+
+prof_science_data <- ict_summary %>% 
+  filter(sec_name == "Prof, Sci & Tech")
+
+```
+
+In the sample, the Professional, Scientific, and Technical Activities sector coded with "M" includes a broad spectrum of services such as legal, accounting, architectural, engineering, and specialized scientific research, excluding veterinary activities. On average, this sector comprises **`r round(mean(prof_science_data$count), 2)`** firms annually. It represents **`r round(mean(prof_science_data$proportion), 2)`%** of the total sample with a variability (standard deviation) of **`r round(sd(prof_science_data$proportion), 2)`%** across the years.
+
+```{r Prof_science, echo=FALSE}
+
+
+# Display the table
+kable(prof_science_data, "latex", longtable = F, booktabs = TRUE, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = "repeat_header") %>%   
+  pack_rows("",1,6)
+
+
+
+
+```
+
+## Rental & Travel
+
+```{r Rental_&_Travel1, echo=FALSE}
+
+rental_travel_data <- ict_summary %>% 
+  filter(sec_name == "Rental & Travel")
+
+```
+
+In the sample, the Rental and Travel Services sector, coded with the letter "N," encompasses activities related to rental services and travel agency operations. On average, this sector features **`r round(mean(rental_travel_data$count), 2)`** firms annually. It accounts for **`r round(mean(rental_travel_data$proportion), 2)`%** of the total sample, with a standard deviation of **`r round(sd(rental_travel_data$proportion), 2)`%** across the years.
+
+```{r Rental_&_Travel, echo=FALSE}
+
+# Display the table
+kable(rental_travel_data, "latex", longtable = F, booktabs = TRUE, escape = T ) %>%
+  kable_styling(font_size = 6, latex_options = "repeat_header") %>%   
+  pack_rows("",1,6)
+
+
+
+```
+
+## Tech Repair
+
+```{r Tech_Repair1, echo=FALSE}
+tech_repair_data <- ict_summary %>% 
+  filter(sec_name == "Tech Repair")
+```
+
+In the sample, the sector coded with the letter "S," specifically subgroup 95, focuses on the Repair of Computers and Communication Equipment. This specialized sector consistently includes **`r round(mean(tech_repair_data$count), 2)`** firms annually. It accounts for **`r round(mean(tech_repair_data$proportion), 2)`%** of the total sample, with a standard deviation of **`r round(sd(tech_repair_data$proportion), 2)`%** across the years.
+
+```{r Tech_Repair, echo=FALSE}
+# Display the table
+kable(tech_repair_data, "latex", longtable = F, booktabs = TRUE, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = "repeat_header") %>%   
+  pack_rows("",1,6)
+```

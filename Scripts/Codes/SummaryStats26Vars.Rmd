@@ -1,0 +1,703 @@
+---
+title: "Summary Statistics of 26 Variables by Firm"
+author: "Luis Carlos Castillo"
+date: "`r Sys.Date()`"
+institute: |
+  | 
+  | University of Urbino and Universty of Bremen
+header-includes:
+- \usepackage{booktabs}
+- \usepackage{longtable}
+output:
+  beamer_presentation: default
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE}
+#### 0. Load the necessary packages #####
+library(readr)
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(here)
+library(git2r)
+library(visdat)
+library(naniar)
+library(chatgpt)
+library(gptstudio)
+require(devtools)
+library(caret)
+library(mice)
+library(knitr)
+library(kableExtra)
+
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = F, message = F )
+kableExtra.auto_format = FALSE
+knitr.table.format = "latex"
+knitr::opts_knit$set(kable.force.latex = TRUE)
+
+```
+
+
+```{r loading_data, echo = FALSE}
+
+load(here("Data", "Processed", "ICT_Combined.rda"))
+
+```
+
+## Firms Size Using 3 Levels Measured by Revenue
+
+```{r size, echo=FALSE}
+# Count the observations of each level of CLAD4 grouped by year
+
+# Recode and count observations, then calculate proportions
+
+counts_clad4_by_year <- ict_combined %>%
+  dplyr::group_by(year, size_rev) %>%
+  dplyr::summarise(count = n(), .groups = 'drop') %>%
+  dplyr::group_by(year) %>%
+  dplyr::mutate(total = sum(count),
+                props = round(count / total, 3)) 
+
+kable(counts_clad4_by_year, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   pack_rows("",1,3) %>% pack_rows("",4,6) %>% pack_rows("",7,9) %>% pack_rows("",10,12) %>% pack_rows("",13,15) %>% pack_rows("",16,18)
+
+
+
+```
+
+
+
+## Firms Size Using 2 Levels Measured by Revenue
+
+```{r size2, echo=FALSE}
+# Count the observations of each level of CLAD4 grouped by year
+
+# Recode and count observations, then calculate proportions
+
+counts_clad4_by_year1 <- ict_combined %>%
+  dplyr::group_by(year, sme_rev) %>%
+  dplyr::summarise(count = n(), .groups = 'drop') %>%
+  dplyr::group_by(year) %>%
+  dplyr::mutate(total = sum(count),
+                props = round(count / total, 3)) 
+
+kable(counts_clad4_by_year1, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   pack_rows("",1,2) %>% pack_rows("",3,4) %>% pack_rows("",5,6) %>% pack_rows("",7,8) %>% pack_rows("",9,10) 
+
+```
+
+
+## Variables 
+
+In total there are 26 variables use to extract the factors that represent each construct access, skills, and usage.
+
+ - For the access index 6 variables 
+ - For the skills index 9 variables
+ - For the usage index 11 variables
+
+
+## ACCESS variables I
+
+These variables include continuous and binary variables' in total there are 6 variables. There is one variables for incentives access and five for physical access measuring computers and internet connectivity.
+
+## ACCESS variables II (Incentives)
+
+-   Var name: IT training courses for employees without specialist ICT skills.
+-   Type: binary
+-   Code: A1\_B2b
+
+```{r A1_B2b, echo=FALSE}
+
+get_binary_summary_stats_by_group <- function(df, group_var, summary_var) {
+  # Ensure the binary variable is treated as numeric
+  df[[summary_var]] <- as.numeric(as.character(df[[summary_var]]))
+  
+  df %>%
+    group_by(.data[[group_var]]) %>%
+    summarise(
+      count = n(),
+      prop = round(mean(.data[[summary_var]], na.rm = TRUE), 2),
+      std_dev = round(sd(.data[[summary_var]], na.rm = TRUE), 2),
+      num_0s = sum(.data[[summary_var]] == 0, na.rm = TRUE),
+      num_1s = sum(.data[[summary_var]] == 1, na.rm = TRUE),
+      prop_0s = round(mean(.data[[summary_var]] == 0, na.rm = TRUE), 2),
+      prop_1s = round(mean(.data[[summary_var]] == 1, na.rm = TRUE), 2),
+      .groups = 'drop'
+    ) %>%
+    mutate(
+      lo_95_CI = round(prop - 1.96 * sqrt(prop * (1 - prop) / count), 2),
+      up_95_CI = round(prop + 1.96 * sqrt(prop * (1 - prop) / count), 2)
+    )
+}
+
+# Example usage:
+A1_B2b_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "A1_B2b")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(A1_B2b_summary, "latex", longtable = F, booktabs = T,escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+
+
+
+
+```
+
+
+## ACCESS variables III (Physical Access)
+
+-   Var name: Percentage of employees using the computer out of the total employees.
+-   Type: continuous
+-   Code: A2\_A2
+
+```{r A2_A2, echo= F}
+
+get_summary_continuous_stats_by_group <- function(df, group_var, summary_var) {
+  df %>%
+    group_by({{ group_var }}) %>%
+    summarise(
+      count = n(),
+      mean = round(mean({{ summary_var }}, na.rm = TRUE), 2),
+      sd = round(sd({{ summary_var }}, na.rm = TRUE), 2),
+      median = round(median({{ summary_var }}, na.rm = TRUE), 2),
+      min = round(min({{ summary_var }}, na.rm = TRUE), 2),
+      max = round(max({{ summary_var }}, na.rm = TRUE), 2),
+      IQR = round(IQR({{ summary_var }}, na.rm = TRUE), 2)
+    )
+}
+
+A2_A2_summary <- get_summary_continuous_stats_by_group(ict_combined, year, A2_A2)
+
+
+kable(A2_A2_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+
+
+```
+
+## ACCESS variables IV (Physical Access)
+
+Density plot
+
+```{r density_plot_A2_A2, echo= F}
+
+# Plot density for access_n by year
+ggplot(ict_combined, aes(x = A2_A2, fill = year)) +
+  geom_density(alpha = 0.5) +
+  facet_wrap(~ year) +
+  labs(title = "Density Plot for A2_A2 by Year",
+       x = "A2_A2",
+       y = "Density") +
+  scale_fill_brewer(palette = "Set1")
+```
+
+
+## ACCESS variables V (Physical Access)
+
+-   Var name: Percentage of employees using computers connected to the internet.
+-   Type: continuous
+-   Code: A2\_C2
+
+```{r A2_C2, echo= F}
+
+A2_C2_summary <- get_summary_continuous_stats_by_group(ict_combined, year, A2_C2)
+
+
+kable(A2_C2_summary, "latex", longtable = F, booktabs = T , escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+
+
+```
+
+## ACCESS variables VI (Physical Access)
+
+Density plot
+
+```{r density_plot_A2_C2, echo= F}
+
+# Plot density for access_n by year
+ggplot(ict_combined, aes(x = A2_C2, fill = year)) +
+  geom_density(alpha = 0.5) +
+  facet_wrap(~ year) +
+  labs(title = "Density Plot for A2_C2 by Year",
+       x = "A2_C2",
+       y = "Density") +
+  scale_fill_brewer(palette = "Set1")
+```
+
+
+## ACCESS variables VII (Physical Access)
+
+-   Var name: Enterprise provides mobile devices with mobile connection.
+-   Type: binary
+-   Code: A2\_C5a
+
+```{r A2_C5a, echo= F}
+
+A2_C5a_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "A2_C5a")
+
+
+kable(A2_C5a_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+
+
+```
+
+
+## ACCESS variables VIII (Physical Access)
+
+-   Internet download speed low between 2 Mbit/s to 30 Mbit/s.
+-   Type: continuous
+-   Code: A2\_C4\_low
+
+```{r A2_C4_low, echo= F}
+
+A2_C4_low_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "A2_C4_low")
+
+
+kable(A2_C4_low_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+
+
+```
+
+
+## ACCESS variables IX (Physical Access)
+
+-   Internet download speed low between 2 Mbit/s to 30 Mbit/s.
+-   Type: continuous
+-   Code: A2\_C4\_high
+
+```{r A2_C4_high, echo= F}
+
+A2_C4_high_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "A2_C4_high")
+
+
+kable(A2_C4_high_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+
+
+```
+
+
+
+
+## SKILLS variables I
+
+11 variables were selected, these variables include only binary variables. It represents the digital skills withing the enterprise. Measuring ICT training and the use of internal personnel to develop ICT tasks.
+
+## SKILLS variables II 
+
+-   Var name: Employment of specialists in computer subjects.
+-   Type: binary
+-   Code: S_B1
+
+```{r S_B1, echo=FALSE}
+
+# Example usage:
+S_B1_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "S_B1")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(S_B1_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+```
+
+
+
+## SKILLS variables III
+
+-   Var name: IT training courses for employees with specialist ict skills.
+-   Type: binary
+-   Code: S_B2a
+
+```{r S_B2a, echo=FALSE}
+
+# Example usage:
+S_B2a_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "S_B2a")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(S_B2a_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+```
+
+
+
+## SKILLS variables IV
+
+-   Use of internal personnel for ICT infrastructure maintenance.
+-   Type: binary
+-   Code: S_B5a1
+
+```{r S_B5a1, echo=FALSE}
+
+# Example usage:
+S_B5a1_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "S_B5a1")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(S_B5a1_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%
+  pack_rows("",1,6)
+```
+
+## SKILLS variables V
+
+-   Var name: Use of internal personnel for office software support.
+-   Type: binary
+-   Code: S_B5b1
+
+```{r S_B5b1, echo=FALSE}
+
+# Example usage:
+S_B5b1_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "S_B5b1")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(S_B5b1_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%
+  pack_rows("",1,6)
+```
+
+
+## SKILLS variables VI
+
+-   Var name: Use of internal personnel for enterprise software development.
+-   Type: binary
+-   Code: S_B5c1
+
+```{r S_B5c1, echo=FALSE}
+
+# Example usage:
+S_B5c1_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "S_B5c1")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(S_B5c1_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%
+  pack_rows("",1,6)
+```
+
+
+## SKILLS variables VII
+
+-   Var name: Use of internal personnel for enterprise software support.
+-   Type: binary
+-   Code: S_B5d1
+
+```{r S_B5d1, echo=FALSE}
+
+# Example usage:
+S_B5d1_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "S_B5d1")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(S_B5d1_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%
+  pack_rows("",1,6)
+```
+
+
+## SKILLS variables VIII
+
+-   Var name: Use of internal personnel for enterprise software support.
+-   Type: binary
+-   Code: S_B5e1
+
+```{r S_B5e1, echo=FALSE}
+
+# Example usage:
+S_B5e1_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "S_B5e1")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(S_B5e1_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%
+  pack_rows("",1,6)
+```
+
+## SKILLS variables IX
+
+-   Var name: Use of internal personnel for web development support.
+-   Type: binary
+-   Code: S_B5f1
+
+```{r S_B5f1, echo=FALSE}
+
+# Example usage:
+S_B5f1_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "S_B5f1")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(S_B5f1_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%
+  pack_rows("",1,6)
+```
+
+
+## SKILLS variables X
+
+-   Var name: Use of internal personnel for web development support.
+-   Type: binary
+-   Code: S_B5g1
+
+```{r S_B5g1, echo=FALSE}
+
+# Example usage:
+S_B5g1_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "S_B5g1")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(S_B5g1_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%
+  pack_rows("",1,6)
+```
+
+
+
+## USAGE variables I
+
+These variables include only binary variables, we selected 11 variables. It measures how the enterprise use a variety of digital technologies in different business operations in marketing, management, e-commerce and human resources.
+
+
+## USAGE variables II (Marketing)
+
+-   Var name: Use of Website
+-   Type: binary
+-   Code: UMK_C7
+
+```{r UMK_C7, echo=FALSE}
+
+# Example usage:
+UMK_C7_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "UMK_C7")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(UMK_C7_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+```
+
+
+
+## USAGE variables III (Marketing)
+
+-   Var name: possibility to place orders or reservations online eg online shopping cart
+-   Type: binary
+-   Code: UMK_C8c
+
+```{r UMK_C8c, echo=FALSE}
+
+# Example usage:
+UMK_C8c_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "UMK_C8c")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(UMK_C8c_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+```
+
+
+
+## USAGE variables IV (Marketing)
+
+-   Var name: Links or references to company profiles on social media
+-   Type: binary
+-   Code: UMK_C8h
+
+```{r UMK_C8h, echo=FALSE}
+
+# Example usage:
+UMK_C8h_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "UMK_C8h")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(UMK_C8h_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+```
+
+
+## USAGE variables V (Marketing)
+
+-   Var name: Use of social network.
+-   Type: binary
+-   Code: UMK_C10a
+
+```{r UMK_C10a, echo=FALSE}
+
+# Example usage:
+UMK_C10a_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "UMK_C10a")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(UMK_C10a_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+```
+
+## USAGE variables VI (Marketing)
+
+-   Var name: Social media and multimedia.
+-   Type: binary
+-   Code: UMK_C10c
+
+```{r UMK_C10c, echo=FALSE}
+
+# Example usage:
+UMK_C10c_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "UMK_C10c")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(UMK_C10c_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+```
+
+
+## USAGE variables VII (Management)
+
+-   Var name: Using ERP software
+-   Type: binary
+-   Code: UM_E1
+
+```{r UM_E1, echo=FALSE}
+
+# Example usage:
+UM_E1_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "UM_E1")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(UM_E1_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+```
+
+
+## USAGE variables VIII (Management)
+
+-   Var name: Use operational CRM software
+-   Type: binary
+-   Code: UM_E2b
+
+```{r UM_E2b, echo=FALSE}
+
+# Example usage:
+UM_E2b_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "UM_E2b")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(UM_E2b_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+```
+
+
+## USAGE variables IX (Management)
+
+-   Var name: Use analytical CRM software
+-   Type: binary
+-   Code: UM_E2a
+
+```{r UM_E2a, echo=FALSE}
+
+# Example usage:
+UM_E2a_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "UM_E2a")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(UM_E2a_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+```
+
+## USAGE variables XI (e-commerce)
+
+-   Var name: Possibility to place orders or reservations online eg online shopping cart
+-   Type: binary
+-   Code: UC_C8a
+
+```{r UC_C8a, echo=FALSE}
+
+# Example usage:
+UC_C8a_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "UC_C8a")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(UC_C8a_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+```
+
+
+## USAGE variables XII (e-commerce)
+
+-   Var name: Web sales through intermediary websites or ecommerce sites marketplaces or apps
+-   Type: binary
+-   Code: UC_J7
+
+```{r UC_J7, echo=FALSE}
+
+# Example usage:
+UC_J7_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "UC_J7")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(UC_J7_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+```
+
+
+## USAGE variables XIII (Human Resources)
+
+-   Var name: Announcement of vacancies or possibility to apply for employment online.
+-   Type: binary
+-   Code: UM_C8g
+
+```{r UM_C8g, echo=FALSE}
+
+# Example usage:
+UM_C8g_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "UM_C8g")
+
+# Make sure to use the format "latex" for PDF output
+
+
+kable(UM_C8g_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,6)
+```
+
+

@@ -1,0 +1,350 @@
+---
+title: "Mapping the Evolution of the Digital Divide: Comparative Analysis of European Research and the Multifaceted Dimensions in Italian Enterprises"
+author: "Luis Carlos Castillo"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output:
+  beamer_presentation:
+    keep_tex: yes
+    citation_package: natbib
+    includes:
+      in_header: mystyle2.tex
+institute: |
+  | Binational Doctorate
+  | University of Urbino and Universty of Bremen
+  | Ph.D. Program in Global Studies
+  | Supervisor: Prof. Francesco Vidoli
+  | Co-Supervisor: Prof. Dr. Christian Cordes
+editor_options:
+  markdown:
+    wrap: 72
+link-citations: yes
+linkcolor: myblue
+natbiboptions: round
+header-includes:
+ - \usepackage{etoolbox}
+ - \AtBeginEnvironment{thebibliography}{\scriptsize}
+bibliography: ShiftPatterns.bib
+---
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = F, message = F )
+kableExtra.auto_format = FALSE
+knitr.table.format = "latex"
+knitr::opts_knit$set(kable.force.latex = TRUE)
+
+```
+
+```{r, include=FALSE}
+options(tinytex.verbose = TRUE)
+```
+
+```{r Loading packages, include=FALSE}
+library(tidyverse)
+library(devtools)
+library(here)
+library(bibliometrix)
+library(stringr)
+library(readr)
+library(visdat)
+library(stringr)
+library(dplyr)
+library(readxl)
+library(janitor)
+library(ggplot2)
+library(gridExtra)
+options(kableExtra.latex.load_packages = FALSE)
+library(kableExtra)
+library(rmarkdown)
+library(tidytext)
+library(knitr)
+library(qwraps2)
+library(dplyr)
+library(tables)
+library(bibtex)
+library(igraph)
+library(RColorBrewer)
+library(Matrix)
+library(flextable)
+library(ggpubr)
+library(cowplot)
+library(ggeasy)
+library(Hmisc)
+library(gridGraphics)
+library(gridBase)
+library(tinytex)
+library(stargazer)
+
+```
+
+# Cumulative Dissertation
+
+```{=tex}
+\begin{center}
+\includegraphics[width=1\textwidth, height=0.75\textheight]{structure_thesis.png}
+\end{center}
+```
+# Chapter 3
+
+## \centering{Exploring Patterns and Shifts: Factor Analysis of the First  and Second-Level Digital Divide in Italian Enterprises}
+
+# Content I
+
+1.  Introduction
+
+2.  Digital divide overview
+
+3.  Objectives and Research Questions
+
+4.  Theoretical Framework
+
+5.  Data
+
+6.  Methodology
+
+7.  Results
+
+# 1. Introduction
+
+-   DT play a pivotal role in reshaping business models [@trischler2023]
+    , driving innovation [@ciarli2021], and fostering competitive
+    advantages [@jeganjosephjerome2024].
+
+-   The unequal adoption of DT has led to significant challenge: the
+    digital divide.
+
+-   The digital divide at the firm level is a multifaceted gap
+    characterized not only by disparities in access, skills and usage of
+    DT, but also the derived benefits from different types of use.
+
+-   While the digital divide is a global issue, its impact on
+    enterprises, especially in Italy, presents unique challenges and
+    opportunities.
+
+# 2. Digital divide overview
+
+-   The digital divide at the firm level is a topic that needs further
+    exploration [@pejicbach2013; @acilar2021; @lythreatis2022;
+    @thonipara2023; @shakina2021a; @siqueira2019].
+
+-   **Fragmented research:** Highlights the different frameworks and
+    measurements in the field. [@forman2002; @vehovar2006;
+    @shakina2021a; @acilar2021; @ndulu2022].
+
+-   **Impact on Business Performance:** Addresses how DT impact
+    innovation [@usai2021], productivity [@cusolito2020], and wages
+    between high and low skilled labor [@vasilescu2020] . Leaving room
+    for further analysis on the underlying causes of digital
+    disparities.
+
+# 3. Objectives
+
+-   Develop composite indices to track trends in the first and
+    second-level digital divide.
+
+-   Analyze variations in the first and second-level digital divide
+    across firm sizes, sectors, and regions in Italy.
+
+-   Evaluate the alignment of resources and technology integration
+    theory with observed data.
+
+-   Propose targeted policy interventions based on research findings.
+
+# 3.1. Research Questions
+
+-   How does the Resources and Technology Integration theory reflect
+    observed patterns in DT adoption across different Italian enterprises?
+
+-   What are the evolving patterns and shifts in access, skills, and usage
+    among Italian enterprises, and how do these dynamics reflect the
+    disparities between the three indices across different firm sizes,
+    sectors, and regions over a six-year period?
+
+-   According to the findings, what policy interventions can be
+    recommended to help Italian enterprises more effectively bridge the
+    digital divide?
+
+# 4. Theoretical Framework
+
+-   Adaptation of the Resources and Appropriation Theory (van Dijk 2005,
+    2020) toward the Resources and Technology Integration Theory.
+
+```{=tex}
+\begin{center}
+\includegraphics[width=1\textwidth, height=0.75\textheight]{dd_model.png}
+\end{center}
+```
+
+# 5. Data
+
+```{r avgYear, echo=FALSE}
+
+load(here("Data", "Processed", "CI_clean.rda"))
+
+# Calculate the number of observations per year
+options(scipen=999)
+observations_per_year <- CI_clean %>%
+  group_by(year) %>%
+  summarise(count = n())
+
+avgPerYear <- round(mean(observations_per_year$count),2)
+
+```
+
+-   The dataset was derived from the ICT Usage in Enterprises Survey
+    conducted annually between 2014 and 2019 by ISTAT.
+
+-   Each year, the survey collected an average of `r avgPerYear`
+    observations.
+
+-   The analysis focused on a selection of variables from the survey
+    that met certain criteria.
+
+-   Considerations and Limitations.
+
+    -   Independence of Annual Data
+    
+-    Data treatments, codes, and summary statistics are available on my [GitHub repository](https://github.com/luchocastillo84/Clusterwise_DD_Italy) for replicability and further analysis.
+
+# 5.1 List of Variables I
+
+-   In total 26 variables were used.
+
+    -   Access index 6 variables
+    -   Skills index 9 variables
+    -   Usage index 11 variables
+
+```{=tex}
+\begin{center} 
+\includegraphics[width=1\textwidth]{access_vars.png}
+\end{center}
+```
+-   
+
+    (C) Continuous variables, (B) Binary variables.
+
+# 5.2 List of Variables II
+
+```{=tex}
+\begin{center}
+\includegraphics[width=1\textwidth,height=0.7\textheight]{skills_usage_vars.png}
+\end{center}
+```
+
+# 6 Methodology
+
+-   The indices were constructed using dimensionality reduction
+    techniques Factor Analysis for Mixed Data (FAMD) and Multiple
+    Correspondence Analysis (MCA).
+-   Visualise and measure adoption patterns.
+
+$$ \text{Access Index}_i = a_1 \cdot X1_i + a_2 \cdot X2_i + \ldots + a_6 \cdot X6_i $$
+$$ \text{Skills Index}_i = b_1 \cdot Y1_i + b_2 \cdot Y2_i + \ldots + b_6 \cdot Y6_i $$
+$$ \text{Usage Index}_i = c_1 \cdot Z1_i + c_2 \cdot Z2_i + \ldots + c_{11} \cdot Z11_i $$
+
+
+Where $\mathbf{X}$, $\mathbf{Y}$, and $\mathbf{Z}$ are the matrices of observations, and $\mathbf{a}$, $\mathbf{b}$, and $\mathbf{c}$ are the vectors of weights derived from FAMD and MCA contributions of each variable to the retained dimensions.
+
+
+# 7. Results I
+
+```{r yearTrendSize, echo=FALSE}
+load(here("Scripts", "Environments",  "size_rev_results_weighted.RData"))
+
+line_plot_by_smeR
+
+```
+
+# 7. Key takeaways I
+
+
+- While SMEs can maintain continuous growth in access, larger firms face different challenges.
+
+- These findings align with Bratta et al. (2020), who discuss the hyper-depreciation measure issued in 2016.
+
+- SMEs face more challenges in acquiring digital skills. There is a significant shortage of ICT graduates in Italy according to the “Digital Skills Observatory” in 2019.
+
+- A higher usage index is present in SMEs as existing technologies need to be operated either by outsourcing digital skills or maximising the existing workforce.
+
+
+# 7.1. Results II
+
+```{r yearTrendMac, echo=FALSE}
+load(here("Scripts", "Environments", "size_rev_results_weighted.RData"))
+
+line_plot_by_mac
+
+```
+
+# 7.1. Key takeaways II
+
+- Notable progress in digital access across sectors due to effective policy measures like hyper-depreciation.
+
+- The digital skills index remains low, highlighting challenges in developing necessary competencies.
+
+- Commercial, Industrial, Service Sectors: Growing digital access and stable usage, but significant skills gap.
+
+- Creative Industries and ICT Sector: High levels of access and skills but moderate usage, reflecting different technological needs in workflows.
+
+
+# 7.2. Results III
+
+```{r yearTrendReg, echo=FALSE}
+
+load(here("Scripts", "Environments","size_rev_results_weighted.RData"))
+
+line_plot_by_region
+
+```
+
+# 7.2. Key takeaways III
+
+- Northern and Central Regions:
+
+    - Significant improvements in digital access.
+    - Benefits from robust industrial bases and policy interventions.
+    - Persistent skills gap, slight increase towards the end.
+    
+- South and Insular Regions:
+
+    - Lag behind in both access and skills. Reflecting systemic issues.
+    - Need targeted policy efforts.
+    
+- Usage Trends:
+
+    - Similar trends across regions.
+    - DT integration driven by national policies, market forces, and sectoral requirements.
+    
+    
+    
+
+# 7..3 Evaluating Theory in Light of Data
+
+Sequential Model Challenges: While the theory posits a sequential model
+of technology adoption (access → skills → usage), our data shows that
+skills development has not kept pace with access, and usage sometimes
+surpasses skills. This indicates that firms may adopt technologies
+without fully developing digital skills, relying on external support or
+simpler applications.
+
+Inequality in Resources: The theory suggests inequality in
+access to resources leads to disparities in technology adoption.
+However, our data only infers this inequality without direct proof.
+
+# 7.4. Key Interventions
+
+Accelerate Digital Skills Acquisition: Promote and subsidize e-learning
+platforms and certification programs for rapid, flexible digital skills
+training.
+
+Enhance Digital Infrastructure and Support for SMEs in Lagging Regions:
+Expand broadband and mobile network coverage in under-served regions
+through public-private partnerships.
+
+# 8. Q&A
+
+Thank you for your attention
+
+# References {.allowframebreaks}
+
+::: {#refs}
+:::
