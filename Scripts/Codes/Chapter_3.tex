@@ -1,0 +1,519 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  ignorenonframetext,
+]{beamer}
+\usepackage{pgfpages}
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{caption label separator}{: }
+\setbeamercolor{caption name}{fg=normal text.fg}
+\beamertemplatenavigationsymbolsempty
+% Prevent slide breaks in the middle of a paragraph
+\widowpenalties 1 10000
+\raggedbottom
+\setbeamertemplate{part page}{
+  \centering
+  \begin{beamercolorbox}[sep=16pt,center]{part title}
+    \usebeamerfont{part title}\insertpart\par
+  \end{beamercolorbox}
+}
+\setbeamertemplate{section page}{
+  \centering
+  \begin{beamercolorbox}[sep=12pt,center]{part title}
+    \usebeamerfont{section title}\insertsection\par
+  \end{beamercolorbox}
+}
+\setbeamertemplate{subsection page}{
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center]{part title}
+    \usebeamerfont{subsection title}\insertsubsection\par
+  \end{beamercolorbox}
+}
+\AtBeginPart{
+  \frame{\partpage}
+}
+\AtBeginSection{
+  \ifbibliography
+  \else
+    \frame{\sectionpage}
+  \fi
+}
+\AtBeginSubsection{
+  \frame{\subsectionpage}
+}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\newif\ifbibliography
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+
+\usepackage{textpos}
+\setbeamertemplate{headline}{
+  \begin{textblock*}{5cm}(10.2cm,0.2cm)
+  \includegraphics[width=2.2cm]{UniUrb-logo.png}
+  \end{textblock*}}
+  
+  \definecolor{myblue}{HTML}{005997}
+  \setbeamercolor{frametitle}{fg=myblue}
+    \setbeamercolor{framesubtitle}{fg=myblue}
+    \setbeamercolor{frametitle right}{fg=myblue}
+  \setbeamercolor{titlelike}{fg=myblue}
+    \setbeamercolor{title}{fg=myblue}
+      \setbeamercolor{subtitle}{fg=myblue}
+    \setbeamercolor{part title}{fg=myblue}
+    \setbeamercolor{section title}{fg=myblue}
+    \setbeamercolor{subsection title}{fg=myblue}
+  \setbeamercolor{section name}{fg=myblue}
+  \setbeamercolor{subsection name}{fg=myblue}
+  \setbeamercolor{part name}{fg=myblue}
+  \setbeamercolor{title in head/foot}{fg=myblue}
+  \setbeamercolor{subtitle in head/foot}{fg=myblue}
+  \setbeamercolor{block title}{fg=myblue}
+  
+  \setbeamercolor{bullet}{fg=myblue}
+  \setbeamercolor{section in toc}{fg=myblue}
+  \setbeamercolor{subsection in toc}{fg=myblue}
+  \setbeamercolor{section in head/foot}{fg=myblue}
+  \setbeamercolor{subsection in head/foot}{fg=myblue}
+  
+  
+  \setbeamercolor{itemize item}{fg = myblue}
+  \setbeamercolor{itemize subitem}{fg = myblue}
+  \setbeamercolor{itemize subsubitem}{fg = myblue}
+  \setbeamercolor{enumerate item}{fg = myblue}
+  \setbeamercolor{enumerate subitem}{fg = myblue}
+  \setbeamercolor{enumerate subsubitem}{fg = myblue}
+  
+ 
+  
+\usepackage{etoolbox}
+\AtBeginEnvironment{thebibliography}{\scriptsize}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage[round]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Mapping the Evolution of the Digital Divide: Comparative Analysis of European Research and the Multifaceted Dimensions in Italian Enterprises},
+  pdfauthor={Luis Carlos Castillo},
+  colorlinks=true,
+  linkcolor={myblue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Mapping the Evolution of the Digital Divide: Comparative Analysis
+of European Research and the Multifaceted Dimensions in Italian
+Enterprises}
+\author{Luis Carlos Castillo}
+\date{24 June 2024}
+\institute{Binational Doctorate\\
+University of Urbino and Universty of Bremen\\
+Ph.D.~Program in Global Studies\\
+Supervisor: Prof.~Francesco Vidoli\\
+Co-Supervisor: Prof.~Dr.~Christian Cordes}
+
+\begin{document}
+\frame{\titlepage}
+
+\begin{frame}{Cumulative Dissertation}
+\phantomsection\label{cumulative-dissertation}
+\begin{center}
+\includegraphics[width=1\textwidth, height=0.75\textheight]{structure_thesis.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Chapter 3}
+\phantomsection\label{chapter-3}
+\begin{block}{\centering{Exploring Patterns and Shifts: Factor Analysis of the First  and Second-Level Digital Divide in Italian Enterprises}}
+\phantomsection\label{section}
+\end{block}
+\end{frame}
+
+\begin{frame}{Content I}
+\phantomsection\label{content-i}
+\begin{enumerate}
+\item
+  Introduction
+\item
+  Digital divide overview
+\item
+  Objectives and Research Questions
+\item
+  Theoretical Framework
+\item
+  Data
+\item
+  Methodology
+\item
+  Results
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{1. Introduction}
+\phantomsection\label{introduction}
+\begin{itemize}
+\item
+  DT play a pivotal role in reshaping business models
+  \citep{trischler2023} , driving innovation \citep{ciarli2021}, and
+  fostering competitive advantages \citep{jeganjosephjerome2024}.
+\item
+  The unequal adoption of DT has led to significant challenge: the
+  digital divide.
+\item
+  The digital divide at the firm level is a multifaceted gap
+  characterized not only by disparities in access, skills and usage of
+  DT, but also the derived benefits from different types of use.
+\item
+  While the digital divide is a global issue, its impact on enterprises,
+  especially in Italy, presents unique challenges and opportunities.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{2. Digital divide overview}
+\phantomsection\label{digital-divide-overview}
+\begin{itemize}
+\item
+  The digital divide at the firm level is a topic that needs further
+  exploration
+  \citep{pejicbach2013, acilar2021, lythreatis2022, thonipara2023, shakina2021a, siqueira2019}.
+\item
+  \textbf{Fragmented research:} Highlights the different frameworks and
+  measurements in the field.
+  \citep{forman2002, vehovar2006, shakina2021a, acilar2021, ndulu2022}.
+\item
+  \textbf{Impact on Business Performance:} Addresses how DT impact
+  innovation \citep{usai2021}, productivity \citep{cusolito2020}, and
+  wages between high and low skilled labor \citep{vasilescu2020} .
+  Leaving room for further analysis on the underlying causes of digital
+  disparities.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{3. Objectives}
+\phantomsection\label{objectives}
+\begin{itemize}
+\item
+  Develop composite indices to track trends in the first and
+  second-level digital divide.
+\item
+  Analyze variations in the first and second-level digital divide across
+  firm sizes, sectors, and regions in Italy.
+\item
+  Evaluate the alignment of resources and technology integration theory
+  with observed data.
+\item
+  Propose targeted policy interventions based on research findings.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{3.1. Research Questions}
+\phantomsection\label{research-questions}
+\begin{itemize}
+\item
+  How does the Resources and Technology Integration theory reflect
+  observed patterns in DT adoption across different Italian enterprises?
+\item
+  What are the evolving patterns and shifts in access, skills, and usage
+  among Italian enterprises, and how do these dynamics reflect the
+  disparities between the three indices across different firm sizes,
+  sectors, and regions over a six-year period?
+\item
+  According to the findings, what policy interventions can be
+  recommended to help Italian enterprises more effectively bridge the
+  digital divide?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{4. Theoretical Framework}
+\phantomsection\label{theoretical-framework}
+\begin{itemize}
+\tightlist
+\item
+  Adaptation of the Resources and Appropriation Theory (van Dijk 2005,
+
+  \begin{enumerate}
+  [1)]
+  \setcounter{enumi}{2019}
+  \tightlist
+  \item
+    toward the Resources and Technology Integration Theory.
+  \end{enumerate}
+\end{itemize}
+
+\begin{center}
+\includegraphics[width=1\textwidth, height=0.75\textheight]{dd_model.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{5. Data}
+\phantomsection\label{data}
+\begin{itemize}
+\item
+  The dataset was derived from the ICT Usage in Enterprises Survey
+  conducted annually between 2014 and 2019 by ISTAT.
+\item
+  Each year, the survey collected an average of 19741.5 observations.
+\item
+  The analysis focused on a selection of variables from the survey that
+  met certain criteria.
+\item
+  Considerations and Limitations.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Independence of Annual Data
+  \end{itemize}
+\item
+  Data treatments, codes, and summary statistics are available on my
+  \href{https://github.com/luchocastillo84/Factor_Analysis_Digital_Divide/tree/main}{GitHub
+  repository} for replicability and further analysis.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{5.1 List of Variables I}
+\phantomsection\label{list-of-variables-i}
+\begin{itemize}
+\item
+  In total 26 variables were used.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Access index 6 variables
+  \item
+    Skills index 9 variables
+  \item
+    Usage index 11 variables
+  \end{itemize}
+\end{itemize}
+
+\begin{center} 
+\includegraphics[width=1\textwidth]{access_vars.png}
+\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  \begin{enumerate}
+  [(A)]
+  \setcounter{enumi}{2}
+  \tightlist
+  \item
+    Continuous variables, (B) Binary variables.
+  \end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{5.2 List of Variables II}
+\phantomsection\label{list-of-variables-ii}
+\begin{center}
+\includegraphics[width=1\textwidth,height=0.7\textheight]{skills_usage_vars.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{6 Methodology}
+\phantomsection\label{methodology}
+\begin{itemize}
+\tightlist
+\item
+  The indices were constructed using dimensionality reduction techniques
+  Factor Analysis for Mixed Data (FAMD) and Multiple Correspondence
+  Analysis (MCA).
+\item
+  Visualise and measure adoption patterns.
+\end{itemize}
+
+\[ \text{Access Index}_i = a_1 \cdot X1_i + a_2 \cdot X2_i + \ldots + a_6 \cdot X6_i \]
+\[ \text{Skills Index}_i = b_1 \cdot Y1_i + b_2 \cdot Y2_i + \ldots + b_6 \cdot Y6_i \]
+\[ \text{Usage Index}_i = c_1 \cdot Z1_i + c_2 \cdot Z2_i + \ldots + c_{11} \cdot Z11_i \]
+
+Where \(\mathbf{X}\), \(\mathbf{Y}\), and \(\mathbf{Z}\) are the
+matrices of observations, and \(\mathbf{a}\), \(\mathbf{b}\), and
+\(\mathbf{c}\) are the vectors of weights derived from FAMD and MCA
+contributions of each variable to the retained dimensions.
+\end{frame}
+
+\begin{frame}{7. Results I}
+\phantomsection\label{results-i}
+\includegraphics{Chapter_3_files/figure-beamer/yearTrendSize-1.pdf}
+\end{frame}
+
+\begin{frame}{7. Key takeaways I}
+\phantomsection\label{key-takeaways-i}
+\begin{itemize}
+\item
+  While SMEs can maintain continuous growth in access, larger firms face
+  different challenges.
+\item
+  These findings align with Bratta et al.~(2020), who discuss the
+  hyper-depreciation measure issued in 2016.
+\item
+  SMEs face more challenges in acquiring digital skills. There is a
+  significant shortage of ICT graduates in Italy according to the
+  ``Digital Skills Observatory'' in 2019.
+\item
+  A higher usage index is present in SMEs as existing technologies need
+  to be operated either by outsourcing digital skills or maximising the
+  existing workforce.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{7.1. Results II}
+\phantomsection\label{results-ii}
+\includegraphics{Chapter_3_files/figure-beamer/yearTrendMac-1.pdf}
+\end{frame}
+
+\begin{frame}{7.1. Key takeaways II}
+\phantomsection\label{key-takeaways-ii}
+\begin{itemize}
+\item
+  Notable progress in digital access across sectors due to effective
+  policy measures like hyper-depreciation.
+\item
+  The digital skills index remains low, highlighting challenges in
+  developing necessary competencies.
+\item
+  Commercial, Industrial, Service Sectors: Growing digital access and
+  stable usage, but significant skills gap.
+\item
+  Creative Industries and ICT Sector: High levels of access and skills
+  but moderate usage, reflecting different technological needs in
+  workflows.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{7.2. Results III}
+\phantomsection\label{results-iii}
+\includegraphics{Chapter_3_files/figure-beamer/yearTrendReg-1.pdf}
+\end{frame}
+
+\begin{frame}{7.2. Key takeaways III}
+\phantomsection\label{key-takeaways-iii}
+\begin{itemize}
+\item
+  Northern and Central Regions:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Significant improvements in digital access.
+  \item
+    Benefits from robust industrial bases and policy interventions.
+  \item
+    Persistent skills gap, slight increase towards the end.
+  \end{itemize}
+\item
+  South and Insular Regions:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Lag behind in both access and skills. Reflecting systemic issues.
+  \item
+    Need targeted policy efforts.
+  \end{itemize}
+\item
+  Usage Trends:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Similar trends across regions.
+  \item
+    DT integration driven by national policies, market forces, and
+    sectoral requirements.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{7..3 Evaluating Theory in Light of Data}
+\phantomsection\label{evaluating-theory-in-light-of-data}
+Sequential Model Challenges: While the theory posits a sequential model
+of technology adoption (access → skills → usage), our data shows that
+skills development has not kept pace with access, and usage sometimes
+surpasses skills. This indicates that firms may adopt technologies
+without fully developing digital skills, relying on external support or
+simpler applications.
+
+Inequality in Resources: The theory suggests inequality in access to
+resources leads to disparities in technology adoption. However, our data
+only infers this inequality without direct proof.
+\end{frame}
+
+\begin{frame}{7.4. Key Interventions}
+\phantomsection\label{key-interventions}
+Accelerate Digital Skills Acquisition: Promote and subsidize e-learning
+platforms and certification programs for rapid, flexible digital skills
+training.
+
+Enhance Digital Infrastructure and Support for SMEs in Lagging Regions:
+Expand broadband and mobile network coverage in under-served regions
+through public-private partnerships.
+\end{frame}
+
+\begin{frame}{8. Q\&A}
+\phantomsection\label{qa}
+Thank you for your attention
+\end{frame}
+
+\renewcommand\refname{References}
+\begin{frame}[allowframebreaks]{References}
+  \bibliographytrue
+  \bibliography{ShiftPatterns.bib}
+\end{frame}
+
+\end{document}

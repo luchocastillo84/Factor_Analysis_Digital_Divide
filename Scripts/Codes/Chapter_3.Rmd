@@ -203,7 +203,7 @@ avgPerYear <- round(mean(observations_per_year$count),2)
 
     -   Independence of Annual Data
     
--    Data treatments, codes, and summary statistics are available on my [GitHub repository](https://github.com/luchocastillo84/Clusterwise_DD_Italy) for replicability and further analysis.
+-    Data treatments, codes, and summary statistics are available on my [GitHub repository](https://github.com/luchocastillo84/Factor_Analysis_Digital_Divide/tree/main) for replicability and further analysis.
 
 # 5.1 List of Variables I
 
@@ -248,7 +248,7 @@ Where $\mathbf{X}$, $\mathbf{Y}$, and $\mathbf{Z}$ are the matrices of observati
 # 7. Results I
 
 ```{r yearTrendSize, echo=FALSE}
-load(here("Scripts", "Environments",  "size_rev_results_weighted.RData"))
+load(here("Scripts", "Environments",  "ResultsRevBySizeWeighted.RData"))
 
 line_plot_by_smeR
 
@@ -269,7 +269,7 @@ line_plot_by_smeR
 # 7.1. Results II
 
 ```{r yearTrendMac, echo=FALSE}
-load(here("Scripts", "Environments", "size_rev_results_weighted.RData"))
+load(here("Scripts", "Environments", "ResultsRevBySizeWeighted.RData"))
 
 line_plot_by_mac
 
@@ -290,7 +290,7 @@ line_plot_by_mac
 
 ```{r yearTrendReg, echo=FALSE}
 
-load(here("Scripts", "Environments","size_rev_results_weighted.RData"))
+load(here("Scripts", "Environments","ResultsRevBySizeWeighted.RData"))
 
 line_plot_by_region
 
