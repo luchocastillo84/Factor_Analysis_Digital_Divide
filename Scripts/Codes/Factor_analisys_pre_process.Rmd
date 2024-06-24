@@ -1,0 +1,1222 @@
+---
+title: "Tests Before Factor Analysis"
+author: "Luis Carlos Castillo"
+date: "`r Sys.Date()`"
+fontsize: 9pt
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{graphicx}
+  - \setbeamerfont{normal text}{size=\tiny} # Adjust this line as needed
+output:
+  beamer_presentation: default
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE}
+#### 0. Load the necessary packages #####
+library(readr)
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(here)
+library(git2r)
+library(visdat)
+library(naniar)
+library(chatgpt)
+library(gptstudio)
+require(devtools)
+library(caret)
+library(mice)
+library(knitr)
+library(kableExtra)
+library(corrplot)
+library(forcats)
+library(DescTools)
+library(fastDummies)
+library(corrplot)
+library(Compind)
+library(lme4)
+library(Matrix)
+library(ltm)
+
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = F, message = F )
+kableExtra.auto_format = FALSE
+knitr.table.format = "latex"
+knitr::opts_knit$set(kable.force.latex = TRUE)
+
+```
+
+## Data Preparation for Factor Analysis 
+
+```{r loading the environment, echo=FALSE}
+
+
+load(here("Data", "Processed", "ICT_Combined.rda"))
+# load(here("Scripts", "Environments", "CI_DDtot.RData"))
+
+ict_combined$A2_A2 <- ict_combined$A2_A2/ 100
+ict_combined$A2_C2 <- ict_combined$A2_C2/ 100
+ict_combined$A2_C6 <- ict_combined$A2_C6/ 100
+ict_combined <- ict_combined[, -7]
+
+```
+
+
+This section will present the different statistics and test before constructing 
+the composite index. It includes the following:
+
+- **Correlation of Variables:** Understanding correlations between variables is foundational in factor analysis. This assessment helps identify whether groups of variables share common patterns or underlying factors, which justifies their reduction into fewer dimensions.
+- **Internal Consistency:** Evaluating internal consistency, typically through measures like Cronbach’s Alpha, provides insight into the reliability of the variables to consistently measure an underlying construct. High internal consistency indicates that variables purported to measure the same general construct produce similar scores, which is crucial for ensuring the validity of any factors derived from the analysis.
+
+## Data Preparation for Factor Analysis II
+
+- **KMO Test:** The Kaiser-Meyer-Olkin measure of sampling adequacy tests whether the partial correlations among variables are small. A high KMO value (close to 1) suggests that a factor analysis may be useful with your data because the partial correlations are negligible.
+- **Bartlett's Test of Sphericity:** This test checks whether the correlation matrix is an identity matrix, which would indicate that the variables are unrelated and unsuitable for structure detection. A significant result from Bartlett’s test supports the factorability of the correlation matrix.
+- **Cronbach's Alpha:** This statistic measures the overall reliability or internal consistency of a set of scale or test items. It helps to assess whether a set of items can reliably measure an unobserved construct, ensuring that the dimensions extracted from factor analysis are reliable.
+
+## 1. 2014. Correlation of Variables 
+
+```{r corr_A_2014, echo=FALSE}
+
+source(here("Scripts", "Functions", "subsetting_digidivide.R"))
+
+patt <- "^A|^S|^U|^size_rev"
+var2encode <- c("size_rev")
+year <- 2014
+
+subsets_2014 <- subsetting_digidivide(data =  ict_combined, 
+                                      patt =  patt, 
+                                      var2encode = var2encode,
+                                      year =  year, 
+                                      include_weights = F)
+
+A_data_2014 <- subsets_2014$A_data
+
+A_data_2014 <- A_data_2014[, -c(3, 6)]
+
+# Use lapply to loop over the selected columns and convert them to numeric
+# Ensure to reference the correct object and handle data types appropriately
+A_data_2014[] <- lapply(A_data_2014, function(x) {
+  if(is.factor(x)) as.numeric(as.character(x)) else as.numeric(x)
+})
+
+# Sort the column names in alphabetical order
+sorted_col_namesA14 <- sort(names(A_data_2014[, 1:7]))
+
+# Reorder the data frame according to the sorted column names
+A_data_2014_sorted <- A_data_2014[, sorted_col_namesA14]
+
+# Calculate the correlation matrix for the sorted columns
+cor_matrix_sortedA14 <- cor(A_data_2014_sorted, use = "complete.obs")
+
+# Plot the sorted correlation matrix
+corrplot(cor_matrix_sortedA14, method = "square", order = "original", tl.col = "red", tl.srt = 45)
+
+
+```
+
+## 3. 2014. Kaiser-Meyer-Olkin measure
+
+
+```{r KMOtest14, echo=FALSE}
+
+kmo_resultsA14 <- KMO(cor_matrix_sortedA14)
+
+# Convert the KMO results into a data frame for easier use with kable
+# Assuming kmo_results is well-understood and it contains overall MSA and individual KMO values
+msai_df14 <- as.data.frame(kmo_resultsA14$MSAi)
+names(msai_df14) <- "MSA"
+
+# Assuming kmo_results have been obtained from KMO(cor_matrix)
+sorted_names14 <- sort(names(kmo_resultsA14$MSAi))
+
+# Create a data frame for the KMO results with rounding and sorted variable names
+kmo_df <- data.frame(
+  Variable = c("Overall", sorted_names14),
+  KMO = round(c(kmo_resultsA14$MSA, kmo_resultsA14$MSAi[sorted_names14]), 2)  # Round to 2 decimal places and sort KMO values
+)
+
+```
+
+
+
+
+
+
+
+
+
+```{r corr_S_2014, echo=FALSE}
+
+source(here("Scripts", "Functions", "subsetting_digidivide.R"))
+
+patt <- "^A|^S|^U|^size_rev"
+var2encode <- c("size_rev")
+year <- 2014
+
+subsets_2014 <- subsetting_digidivide(data =  ict_combined, 
+                                      patt =  patt, 
+                                      var2encode = var2encode,
+                                      year =  year, 
+                                      include_weights = F)
+
+S_data_2014 <- subsets_2014$S_data
+
+
+
+# Use lapply to loop over the selected columns and convert them to numeric
+# Ensure to reference the correct object and handle data types appropriately
+S_data_2014[] <- lapply(S_data_2014, function(x) {
+  if(is.factor(x)) as.numeric(as.character(x)) else as.numeric(x)
+})
+
+# Sort the column names in alphabetical order
+sorted_col_names14 <- sort(names(S_data_2014[, 1:12]))
+
+# Reorder the data frame according to the sorted column names
+A_data_2014_sorted <- S_data_2014[, sorted_col_names14]
+
+# Calculate the correlation matrix for the sorted columns
+cor_matrix_sorted14 <- cor(A_data_2014_sorted, use = "complete.obs")
+
+# Plot the sorted correlation matrix
+corrplot(cor_matrix_sorted14, method = "square", order = "original", tl.col = "red", tl.srt = 45)
+
+
+```
+
+```{r corr_U_2014, echo=FALSE}
+
+source(here("Scripts", "Functions", "subsetting_digidivide.R"))
+
+patt <- "^A|^S|^U|^size_rev"
+var2encode <- c("size_rev")
+year <- 2014
+
+subsets_2014 <- subsetting_digidivide(data =  ict_combined, 
+                                      patt =  patt, 
+                                      var2encode = var2encode,
+                                      year =  year, 
+                                      include_weights = F)
+
+U_data_2014 <- subsets_2014$U_data
+
+
+
+# Use lapply to loop over the selected columns and convert them to numeric
+# Ensure to reference the correct object and handle data types appropriately
+U_data_2014[] <- lapply(U_data_2014, function(x) {
+  if(is.factor(x)) as.numeric(as.character(x)) else as.numeric(x)
+})
+
+# Sort the column names in alphabetical order
+sorted_col_names14 <- sort(names(U_data_2014[, 1:14]))
+
+# Reorder the data frame according to the sorted column names
+A_data_2014_sorted <- U_data_2014[, sorted_col_names14]
+
+# Calculate the correlation matrix for the sorted columns
+cor_matrix_sorted14 <- cor(A_data_2014_sorted, use = "complete.obs")
+
+# Plot the sorted correlation matrix
+corrplot(cor_matrix_sorted14, method = "square", order = "original", tl.col = "red", tl.srt = 45)
+
+
+```
+
+
+
+## 2. 2014. Correlation of Variables II
+
+- **Strong Positive Correlations**: Some variables exhibit strong positive correlations, indicating shared underlying factors suitable for grouping in factor analysis.
+- **Limited Negative Correlations**: The dataset shows minimal strong negative correlations, simplifying factor analysis interpretations.
+- **Majority Weak or No Correlation**: Many variables demonstrate weak or no correlations, indicating independence and suggesting a complex, multidimensional dataset.
+-  **Suitability for Factor Analysis**: The identification of correlated variable clusters indicates that factor analysis is appropriate. Subsequent statistical tests, such as Bartlett’s Test of Sphericity and the Kaiser-Meyer-Olkin measure, will further verify the dataset's suitability for dimensional reduction.
+
+
+## 3. 2014. Kaiser-Meyer-Olkin measure
+
+
+```{r KMOtest14, echo=FALSE}
+
+kmo_results14 <- KMO(cor_matrix_sorted14)
+
+# Convert the KMO results into a data frame for easier use with kable
+# Assuming kmo_results is well-understood and it contains overall MSA and individual KMO values
+msai_df14 <- as.data.frame(kmo_results14$MSAi)
+names(msai_df14) <- "MSA"
+
+# Assuming kmo_results have been obtained from KMO(cor_matrix)
+sorted_names14 <- sort(names(kmo_results14$MSAi))
+
+# Create a data frame for the KMO results with rounding and sorted variable names
+kmo_df <- data.frame(
+  Variable = c("Overall", sorted_names14),
+  KMO = round(c(kmo_results14$MSA, kmo_results14$MSAi[sorted_names14]), 2)  # Round to 2 decimal places and sort KMO values
+)
+
+```
+
+```{r KMOtest14a, echo=FALSE}
+
+
+# # Display the results in R Markdown using kable
+# kable(msai_df, caption = "KMO Measure of Sampling Adequacy for Individual Variables", format = "markdown") %>%
+#   kable_styling(bootstrap_options = c("striped", "hover"))
+
+kable(kmo_df, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,1)%>%  
+  pack_rows("",2,6)%>%    
+  pack_rows("",7,9) %>%   
+  pack_rows("",10,18)
+
+```
+
+## 4. 2014. Kaiser-Meyer-Olkin measure II
+
+
+- **Overall KMO (0.80)**: Indicates strong suitability of the dataset for factor analysis, suggesting robust relationships among all variables.
+-  **Access Variables ('A')**: Range from moderate to excellent (0.69 to 0.89), with higher values indicating significant potential for revealing underlying access factors.
+- **Skills Variables ('S')**: Show high adequacy, particularly with a KMO of 0.90 for S\_B5a, ideal for uncovering latent skills constructs.
+-  **Usage Variables ('U')**: Exhibit excellent suitability, with values like 0.91 for UM\_C8g, demonstrating strong potential for identifying usage patterns.
+
+These results confirm that factor analysis is appropriate for exploring the dataset, offering insights into the interconnectedness of access, skills, and usage variables.
+
+## 5. 2014. Bartlett's Test of Sphericity
+
+
+```{r Bartletts14, echo=FALSE}
+
+# Perform Bartlett's Test of Sphericity
+bartlett_test14 <- cortest.bartlett(cor_matrix_sorted14, nrow(ict_cor_14))
+
+# Extract the results
+bartlett_results14 <- data.frame(
+  Statistic = round(bartlett_test14$chisq, 3),
+  Degrees_of_Freedom = bartlett_test14$df,
+  p_Value = round(bartlett_test14$p.value, 3)
+)
+
+kable(bartlett_results14, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) 
+```
+
+The results from Bartlett's Test of Sphericity show a chi-square value of 100296.2 and a p-value of zero, with 136 degrees of freedom. These findings strongly reject the null hypothesis, confirming significant correlations among variables. This supports the suitability of the dataset for factor analysis, indicating meaningful correlations that are ideal for extracting factors.
+
+
+## 6. 2014.Cronbach’s Alpha 
+
+```{r alpha14, echo=FALSE}
+
+# Calculate Cronbach's alpha for the first 17 variables
+overall_alpha <- alpha(ict_cor_14[, 1:17])
+
+
+# Indices for continuous variables
+cont_indices <- c(1, 6, 8)
+
+
+# Indices for binary variables - all the first 17 except the continuous ones
+binary_indices <- setdiff(1:17, cont_indices)
+
+# Calculate Cronbach's alpha for continuous variables
+cont_alpha <- alpha(ict_cor_14[, cont_indices])
+
+
+
+# Calculate Cronbach's alpha for binary variables
+binary_alpha <- alpha(ict_cor_14[, binary_indices])
+
+A_vars <- names(ict_14_dd_0)[grepl("^(A|^clad4_)", names(ict_14_dd_0))]
+
+A_df_14 <- ict_14_dd_0[, A_vars]
+
+
+# Convert all factor variables to numeric
+A_df_14 <- data.frame(lapply(A_df_14, function(x) {
+  if (is.factor(x)) {
+    as.numeric(as.character(x))
+  } else {
+    x
+  }
+}))
+
+# For this example, let's assume A_vars contains both binary and continuous data
+# You might want to separate binary and continuous variables
+
+binary_vars <- A_vars[apply(A_df_14, 2, function(x) all(x %in% c(0, 1)))]
+continuous_vars <- setdiff(A_vars, binary_vars)
+
+# Step 3: Calculate KR-20 for binary data
+if (length(binary_vars) > 1) {
+  binary_data <- A_df_14[, binary_vars]
+  kr20_result <- alpha(binary_data, check.keys = TRUE)
+  kr20_value <- kr20_result$total$raw_alpha
+  print(paste("KR-20 for binary data:", kr20_value))
+} else {
+  print("Not enough binary items to calculate KR-20")
+}
+
+# Step 4: Calculate Cronbach's alpha for the entire subset using polychoric correlations
+# Polychoric correlations for mixed data (if any binary data)
+if (length(continuous_vars) > 0 & length(binary_vars) > 0) {
+  mixed_data <- A_df_14[, c(binary_vars, continuous_vars)]
+  polychoric_corr <- hetcor(mixed_data)
+  cor_matrix <- polychoric_corr$correlations
+  alpha_mixed <- cronbach.alpha(cor_matrix)
+  print(paste("Cronbach's Alpha for mixed data:", alpha_mixed))
+} else {
+  # If no mixed data, calculate Cronbach's alpha for either all binary or all continuous
+  if (length(continuous_vars) > 1) {
+    continuous_data <- A_df_14[, continuous_vars]
+    alpha_continuous <- alpha(continuous_data)
+    print(paste("Cronbach's Alpha for continuous data:", alpha_continuous$total$raw_alpha))
+  } else if (length(binary_vars) > 1) {
+    binary_data <- A_df_14[, binary_vars]
+    alpha_binary <- alpha(binary_data)
+    print(paste("Cronbach's Alpha for binary data:", alpha_binary$total$raw_alpha))
+  } else {
+    print("Not enough items to calculate Cronbach's Alpha")
+  }
+}
+
+
+
+
+
+```
+
+
+```{r alpha_results14, echo=FALSE, results='asis'}
+
+
+# Create a data frame for displaying results
+alpha_results_df14 <- data.frame(
+  Category = c("Overall", "Continuous Variables", "Binary Variables"),
+  Cronbach_Alpha = c(overall_alpha$total$raw_alpha, 
+                     cont_alpha$total$raw_alpha, 
+                     binary_alpha$total$raw_alpha)
+)
+
+# Use kable to create a table
+kable(alpha_results_df14, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) 
+
+```
+
+-  **Overall Reliability**: The overall Cronbach's Alpha is 0.798, indicating good internal consistency among all variables included. This suggests that the set of variables, when considered collectively, reliably measures underlying constructs.
+    
+-  **Continuous Variables**: For continuous variables is 0.861, demonstrating very good reliability. Indicating that continuous variables in the dataset are particularly consistent and effective in capturing the constructs they are intended to measure.
+    
+- **Binary Variables**: For binary variables is 0.758, which is still acceptable but slightly lower than for continuous variables. This indicates moderate reliability, suggesting they are somewhat less reliable than continuous variables.
+
+
+## 1. 2015. Correlation of Variables 
+```{r corr_2015, echo=FALSE}
+
+ict_15 <- ict_combined %>% dplyr::filter(year == 2015)
+
+# Select columns by index and convert them to numeric
+ict_cor_15 <- ict_15 %>%
+  dplyr::select(3:19) %>%
+  dplyr::mutate(across(everything(), ~as.numeric(as.character(.))))
+
+# Sort the columns in alphabetical order by column names
+sorted_col_names15 <- sort(names(ict_cor_15))
+ict_cor_15_sorted <- ict_cor_15[, sorted_col_names15]
+
+# Calculate the correlation matrix for the sorted columns
+cor_matrix_sorted15 <- cor(ict_cor_15_sorted, use = "complete.obs")
+
+# Plot the sorted correlation matrix
+corrplot(cor_matrix_sorted15, method = "square", order = "AOE")
+
+```
+
+## 2. 2015. Correlation of Variables 
+
+- **Strong Positive Correlations**: Notable among variables such as UC\_C8a, A2\_C6, and UMK\_C7, suggesting potential clusters for factor analysis.
+- **Limited Negative Correlations**: Very few strong negative correlations, indicating minimal opposing relationships within the dataset.
+- **Majority Weak or No Correlation**: Many variable pairs display weak or no correlations, suggesting a high degree of independence.
+- **Suitability for Factor Analysis**: The mix of strong correlations among certain variables and independence among others supports the use of factor analysis to uncover underlying structures.
+
+
+## 3. 2015. Kaiser-Meyer-Olkin measure
+
+```{r KMOtest15, echo=FALSE}
+
+kmo_results15 <- KMO(cor_matrix_sorted15)
+
+# Convert the KMO results into a data frame for easier use with kable
+# Assuming kmo_results is well-understood and it contains overall MSA and individual KMO values
+msai_df15 <- as.data.frame(kmo_results15$MSAi)
+names(msai_df15) <- "MSA"
+
+# Assuming kmo_results have been obtained from KMO(cor_matrix)
+sorted_names15 <- sort(names(kmo_results15$MSAi))
+
+# Create a data frame for the KMO results with rounding and sorted variable names
+kmo_df <- data.frame(
+  Variable = c("Overall", sorted_names15),
+  KMO = round(c(kmo_results15$MSA, kmo_results15$MSAi[sorted_names15]), 2)  # Round to 2 decimal places and sort KMO values
+)
+
+```
+
+```{r KMOtest15a, echo=FALSE}
+
+
+# # Display the results in R Markdown using kable
+# kable(msai_df, caption = "KMO Measure of Sampling Adequacy for Individual Variables", format = "markdown") %>%
+#   kable_styling(bootstrap_options = c("striped", "hover"))
+
+kable(kmo_df, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,1)%>%  
+  pack_rows("",2,6)%>%    
+  pack_rows("",7,9) %>%   
+  pack_rows("",10,18)
+
+```
+
+## 4. 2015. Kaiser-Meyer-Olkin measure
+
+- **Overall KMO (0.75)**: Indicates good suitability for factor analysis, with sufficient common variance among variables.
+- **Access Variables ('A')**: Display a range from moderate to good adequacy, suggesting varied suitability for factor analysis.
+- **Skills Variables ('S')**: High KMO values (around 0.82) reflect excellent adequacy, ideal for exploring underlying skills constructs.
+- **Usage Variables ('U')**: High scores (e.g., 0.91 for UC\_J7) show strong cohesion and suitability for identifying usage patterns.
+
+
+
+
+## 5. 2015. Bartlett's Test of Sphericity
+
+
+```{r Bartletts15, echo=FALSE}
+
+# Perform Bartlett's Test of Sphericity
+bartlett_test15 <- cortest.bartlett(cor_matrix_sorted15, nrow(ict_cor_15))
+
+# Extract the results
+bartlett_results15 <- data.frame(
+  Statistic = round(bartlett_test15$chisq, 3),
+  Degrees_of_Freedom = bartlett_test15$df,
+  p_Value = round(bartlett_test15$p.value, 3)
+)
+
+kable(bartlett_results15, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) 
+```
+
+-  **Chi-square Statistic**: The test yields a value of 80954.42, which is extremely high.
+-  **Degrees of Freedom**: There are 136 degrees of freedom, consistent with the complexity of the dataset.
+- **P-Value**: The p-value is effectively 0, indicating a statistically significant result.
+
+These results decisively reject the null hypothesis, confirming that there are substantial correlations among the variables. This affirms the dataset's appropriateness for factor analysis, indicating the presence of significant underlying factors that can be extracted for further study.
+
+
+
+
+## 6. 2015.Cronbach’s Alpha 
+
+```{r alpha15, echo=FALSE, message=FALSE, warning=FALSE}
+
+# Calculate Cronbach's alpha for the first 17 variables
+overall_alpha <- alpha(ict_cor_15[, 1:17], check.keys = TRUE)
+
+
+# Indices for continuous variables
+cont_indices <- c(1, 6, 8)
+
+
+# Indices for binary variables - all the first 17 except the continuous ones
+binary_indices <- setdiff(1:17, cont_indices)
+
+# Calculate Cronbach's alpha for continuous variables
+cont_alpha <- alpha(ict_cor_15[, cont_indices], check.keys = TRUE)
+
+ict_cor_15$S_B5a <- ifelse(ict_cor_15$S_B5a == 1, 0, 1)
+
+# Recalculate Cronbach's alpha for binary variables with recoded item
+binary_alpha <- alpha(ict_cor_15[, binary_indices], check.keys = TRUE)
+
+
+# # Calculate Cronbach's alpha for binary variables
+# binary_alpha <- alpha(ict_cor_15[, binary_indices])
+
+```
+
+
+```{r alpha_results15, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+
+# Create a data frame for displaying results
+alpha_results_df15 <- data.frame(
+  Category = c("Overall", "Continuous Variables", "Binary Variables"),
+  Cronbach_Alpha = c(overall_alpha$total$raw_alpha, 
+                     cont_alpha$total$raw_alpha, 
+                     binary_alpha$total$raw_alpha)
+)
+
+# Use kable to create a table
+kable(alpha_results_df15, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) 
+
+```
+
+- **Overall Cronbach's Alpha (0.7698)**: This value suggests good internal consistency across the dataset, indicating that the variables collectively provide a reliable measure of the underlying constructs.
+    
+- **Continuous Variables (0.5968)**: The lower alpha value for continuous variables suggests moderate reliability. This indicates that these variables might not cohesively measure a single latent construct or may need further refinement to enhance their internal consistency.
+    
+- **Binary Variables (0.7723)**: The alpha value for binary variables is comparatively higher, indicating good internal consistency. This suggests that the binary variables are more consistent in measuring their respective constructs than the continuous variables.
+    
+
+The overall dataset shows good internal consistency, making it suitable for further analysis. However, the distinction between the types of variables (continuous vs. binary) highlights the need to possibly revise or more closely examine the continuous variables to improve their measurement effectiveness.
+
+
+
+## 1. 2016. Correlation of Variables 
+```{r corr_2016, echo=FALSE}
+
+ict_16 <- ict_combined %>% dplyr::filter(year == 2016)
+
+# Select columns by index and convert them to numeric
+ict_cor_16 <- ict_16 %>%
+  dplyr::select(3:19) %>%
+  dplyr::mutate(across(everything(), ~as.numeric(as.character(.))))
+
+# Sort the columns in alphabetical order by column names
+sorted_col_names16 <- sort(names(ict_cor_16))
+ict_cor_16_sorted <- ict_cor_16[, sorted_col_names16]
+
+# Calculate the correlation matrix for the sorted columns
+cor_matrix_sorted16 <- cor(ict_cor_16_sorted, use = "complete.obs")
+
+# Plot the sorted correlation matrix
+corrplot(cor_matrix_sorted16, method = "square", order = "AOE")
+
+```
+
+## 2. 2016. Correlation of Variables 
+
+- **Strong Positive Correlations**: There are clear clusters of strong positive correlations, especially noticeable among variables such as S\_B5a, A2\_C6, and UC\_J7, which may indicate that these variables measure similar underlying constructs.
+    
+- **Limited Negative Correlations**: The correlogram shows very few strong negative correlations, indicating that variables generally do not have opposing relationships, simplifying the analysis.
+    
+- **Majority Weak or No Correlation**: A significant portion of the matrix displays weak or no correlation between variable pairs, suggesting that many variables operate independently of each other. This diversity in the dataset may reflect a wide range of factors influencing the measured constructs.
+    
+- **Suitability for Factor Analysis**: The presence of both strongly correlated groups and many weakly correlated variables suggests that factor analysis could effectively reduce dimensionality and help uncover underlying factors. However, the independence among many variables should be considered when determining the number of factors to extract.
+
+## 3. 2016. Kaiser-Meyer-Olkin measure
+
+
+- **Overall KMO (0.80)**: Demonstrates good suitability for factor analysis, suggesting that the dataset has substantial common variance among variables.
+- **High KMO Scores**: Notably high values for variables like UC\_J7 (0.94) and UM\_C8g (0.92) indicate excellent readiness for factor analysis, highlighting strong inter-correlations that are ideal for extracting significant factors.
+- **Moderate KMO Scores**: Some variables such as A2\_C2 (0.69) and UC\_C8a (0.71) show moderate adequacy, suggesting they contribute less distinctly to common factors but are still suitable for analysis.
+
+
+## 4. 2016. Kaiser-Meyer-Olkin measure
+
+
+```{r KMOtest16, echo=FALSE}
+
+kmo_results16 <- KMO(cor_matrix_sorted16)
+
+# Convert the KMO results into a data frame for easier use with kable
+# Assuming kmo_results is well-understood and it contains overall MSA and individual KMO values
+msai_df16 <- as.data.frame(kmo_results16$MSAi)
+names(msai_df16) <- "MSA"
+
+# Assuming kmo_results have been obtained from KMO(cor_matrix)
+sorted_names16 <- sort(names(kmo_results16$MSAi))
+
+# Create a data frame for the KMO results with rounding and sorted variable names
+kmo_df <- data.frame(
+  Variable = c("Overall", sorted_names16),
+  KMO = round(c(kmo_results16$MSA, kmo_results16$MSAi[sorted_names16]), 2)  # Round to 2 decimal places and sort KMO values
+)
+
+```
+
+
+```{r KMOtest16a, echo=FALSE}
+
+
+# # Display the results in R Markdown using kable
+# kable(msai_df, caption = "KMO Measure of Sampling Adequacy for Individual Variables", format = "markdown") %>%
+#   kable_styling(bootstrap_options = c("striped", "hover"))
+
+kable(kmo_df, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,1)%>%  
+  pack_rows("",2,6)%>%    
+  pack_rows("",7,9) %>%   
+  pack_rows("",10,18)
+
+```
+
+
+## 5. 2016. Bartlett's Test of Sphericity
+
+
+```{r Bartletts16, echo=FALSE}
+
+# Perform Bartlett's Test of Sphericity
+bartlett_test16 <- cortest.bartlett(cor_matrix_sorted16, nrow(ict_cor_16))
+
+# Extract the results
+bartlett_results16 <- data.frame(
+  Statistic = round(bartlett_test16$chisq, 3),
+  Degrees_of_Freedom = bartlett_test16$df,
+  p_Value = round(bartlett_test16$p.value, 3)
+)
+
+kable(bartlett_results16, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) 
+```
+
+- **Chi-square Statistic**: The test yielded a very high statistic of 112096.2.
+- **Degrees of Freedom**: The test was conducted with 136 degrees of freedom.
+- **P-Value**: The p-value is 0, indicating a statistically significant result.
+
+These findings strongly reject the null hypothesis that the correlation matrix is an identity matrix, confirming significant correlations among the variables. This strongly supports the dataset's suitability for factor analysis, suggesting that it contains meaningful underlying factors that can be extracted for further analysis. The high chi-square value particularly emphasizes the strength of these correlations, indicating a robust dataset for uncovering latent structures.
+
+
+
+## 6. 2016.Cronbach’s Alpha 
+
+```{r alpha16, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+# Calculate Cronbach's alpha for the first 17 variables
+overall_alpha <- alpha(ict_cor_16[, 1:17], check.keys = TRUE)
+
+
+# Indices for continuous variables
+cont_indices <- c(1, 6, 8)
+
+
+# Indices for binary variables - all the first 17 except the continuous ones
+binary_indices <- setdiff(1:17, cont_indices)
+
+# Calculate Cronbach's alpha for continuous variables
+cont_alpha <- alpha(ict_cor_16[, cont_indices], check.keys = TRUE)
+
+ict_cor_16$S_B5a <- ifelse(ict_cor_16$S_B5a == 1, 0, 1)
+
+# Recalculate Cronbach's alpha for binary variables with recoded item
+binary_alpha <- alpha(ict_cor_16[, binary_indices], check.keys = TRUE)
+
+
+# # Calculate Cronbach's alpha for binary variables
+# binary_alpha <- alpha(ict_cor_16[, binary_indices])
+
+```
+
+
+```{r alpha_results16, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+
+# Create a data frame for displaying results
+alpha_results_df16 <- data.frame(
+  Category = c("Overall", "Continuous Variables", "Binary Variables"),
+  Cronbach_Alpha = c(overall_alpha$total$raw_alpha, 
+                     cont_alpha$total$raw_alpha, 
+                     binary_alpha$total$raw_alpha)
+)
+
+# Use kable to create a table
+kable(alpha_results_df16, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) 
+
+```
+
+- **Overall Cronbach's Alpha (0.8167)**: Indicates very good internal consistency across the dataset.
+- **Continuous Variables (0.8731)**: Show excellent reliability, suggesting cohesive measurement of a single latent construct.
+- **Binary Variables (0.7797)**: Display good reliability, albeit slightly lower than continuous variables, indicating consistency in measurement.
+
+The dataset demonstrates strong internal consistency, affirming its suitability for advanced statistical analyses and reliability in measuring underlying constructs.
+
+
+## 1. 2017. Correlation of Variables 
+```{r corr_2017, echo=FALSE}
+
+ict_17 <- ict_combined %>% dplyr::filter(year == 2017)
+
+# Select columns by index and convert them to numeric
+ict_cor_17 <- ict_17 %>%
+  dplyr::select(3:19) %>%
+  dplyr::mutate(across(everything(), ~as.numeric(as.character(.))))
+
+# Sort the columns in alphabetical order by column names
+sorted_col_names17 <- sort(names(ict_cor_17))
+ict_cor_17_sorted <- ict_cor_17[, sorted_col_names17]
+
+# Calculate the correlation matrix for the sorted columns
+cor_matrix_sorted17 <- cor(ict_cor_17_sorted, use = "complete.obs")
+
+# Plot the sorted correlation matrix
+corrplot(cor_matrix_sorted17, method = "square", order = "AOE")
+
+```
+
+## 2. 2017. Correlation of Variables 
+
+- **Strong Positive Correlations**: Clusters of strong positive correlations are observed among variables like S\_B5a, A2\_C6, and UC\_J7, indicating these variables may measure similar underlying constructs. These are promising groups for factor analysis.
+    
+- **Limited Negative Correlations**: The correlogram shows few instances of strong negative correlations, suggesting minimal opposing relationships within the dataset.
+    
+- **Majority Weak or No Correlation**: Many variable pairs exhibit weak or no correlations, indicating a high degree of independence among numerous variables.
+    
+- **Suitability for Factor Analysis**: The presence of strong correlations in specific clusters, along with many weakly correlated variables, suggests that factor analysis could be effective in reducing dimensionality and identifying underlying factors.
+
+## 3. 2017. Kaiser-Meyer-Olkin measure
+
+- **Overall KMO (0.78)**: Indicates good suitability for factor analysis, confirming that the dataset has sufficient common variance among variables for this purpose.
+    
+- **High KMO Scores**: Notably high values for variables such as UC\_J7 (0.93), UM\_C8g (0.89), and UM\_E1 (0.90) demonstrate excellent suitability for factor analysis, indicating strong inter-correlations that are ideal for extracting significant factors.
+    
+- **Moderate KMO Scores**: Some variables like A2\_C2 (0.68) and UC\_C8a (0.67) have lower KMO values, suggesting moderate adequacy. These variables may require more careful consideration during factor analysis to ensure robust factor extraction.
+    
+
+This analysis confirms the dataset's general readiness for factor analysis, highlighting specific variables that show particularly strong potential for contributing to meaningful factor solutions, while others might need additional evaluation to improve their factorability.
+
+
+## 4. 2017. Kaiser-Meyer-Olkin measure
+
+```{r KMOtest17, echo=FALSE}
+
+kmo_results17 <- KMO(cor_matrix_sorted17)
+
+# Convert the KMO results into a data frame for easier use with kable
+# Assuming kmo_results is well-understood and it contains overall MSA and individual KMO values
+msai_df17 <- as.data.frame(kmo_results17$MSAi)
+names(msai_df17) <- "MSA"
+
+# Assuming kmo_results have been obtained from KMO(cor_matrix)
+sorted_names17 <- sort(names(kmo_results17$MSAi))
+
+# Create a data frame for the KMO results with rounding and sorted variable names
+kmo_df <- data.frame(
+  Variable = c("Overall", sorted_names17),
+  KMO = round(c(kmo_results17$MSA, kmo_results17$MSAi[sorted_names17]), 2)  # Round to 2 decimal places and sort KMO values
+)
+
+```
+
+```{r KMOtest17a, echo=FALSE}
+
+# # Display the results in R Markdown using kable
+# kable(msai_df, caption = "KMO Measure of Sampling Adequacy for Individual Variables", format = "markdown") %>%
+#   kable_styling(bootstrap_options = c("striped", "hover"))
+
+kable(kmo_df, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,1)%>%  
+  pack_rows("",2,6)%>%    
+  pack_rows("",7,9) %>%   
+  pack_rows("",10,18)
+
+```
+
+
+
+## 5. 2017. Bartlett's Test of Sphericity
+
+
+```{r Bartletts17, echo=FALSE}
+
+# Perform Bartlett's Test of Sphericity
+bartlett_test17 <- cortest.bartlett(cor_matrix_sorted17, nrow(ict_cor_17))
+
+# Extract the results
+bartlett_results17 <- data.frame(
+  Statistic = round(bartlett_test17$chisq, 3),
+  Degrees_of_Freedom = bartlett_test17$df,
+  p_Value = round(bartlett_test17$p.value, 3)
+)
+
+kable(bartlett_results17, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) 
+```
+
+- **Chi-square Statistic**: The high value of 120201.9.
+- **Degrees of Freedom**: The test used 136 degrees of freedom.
+- **P-Value**: The p-value is 0, indicating a statistically significant result.
+
+These findings robustly reject the null hypothesis, affirming that there are significant correlations among the variables. This confirms the dataset's suitability for factor analysis, indicating a strong presence of meaningful correlations suitable for extracting underlying factors.
+
+## 6. 2017.Cronbach’s Alpha 
+
+```{r alpha17, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+# Calculate Cronbach's alpha for the first 17 variables
+overall_alpha <- alpha(ict_cor_17[, 1:17], check.keys = TRUE)
+
+
+# Indices for continuous variables
+cont_indices <- c(1, 6, 8)
+
+
+# Indices for binary variables - all the first 17 except the continuous ones
+binary_indices <- setdiff(1:17, cont_indices)
+
+# Calculate Cronbach's alpha for continuous variables
+cont_alpha <- alpha(ict_cor_17[, cont_indices], check.keys = TRUE)
+
+ict_cor_17$S_B5a <- ifelse(ict_cor_17$S_B5a == 1, 0, 1)
+
+# Recalculate Cronbach's alpha for binary variables with recoded item
+binary_alpha <- alpha(ict_cor_17[, binary_indices], check.keys = TRUE)
+
+
+# # Calculate Cronbach's alpha for binary variables
+# binary_alpha <- alpha(ict_cor_17[, binary_indices])
+
+```
+
+
+```{r alpha_results17, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+
+# Create a data frame for displaying results
+alpha_results_df17 <- data.frame(
+  Category = c("Overall", "Continuous Variables", "Binary Variables"),
+  Cronbach_Alpha = c(overall_alpha$total$raw_alpha, 
+                     cont_alpha$total$raw_alpha, 
+                     binary_alpha$total$raw_alpha)
+)
+
+# Use kable to create a table
+kable(alpha_results_df17, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) 
+
+```
+
+- **Overall Cronbach's Alpha (0.7840)**: Indicates good internal consistency across the dataset, suitable for reliable analyses.
+- **Continuous Variables (0.8844)**: Show excellent reliability, demonstrating cohesive measurement of underlying constructs.
+- **Binary Variables (0.7350)**: Present good reliability, though slightly lower than for continuous variables, still indicating consistency in measurement.
+
+
+## 1. 2018. Correlation of Variables 
+```{r corr_2018, echo=FALSE}
+
+ict_18 <- ict_combined %>% dplyr::filter(year == 2018)
+
+# Select columns by index and convert them to numeric
+ict_cor_18 <- ict_18 %>%
+  dplyr::select(3:19) %>%
+  dplyr::mutate(across(everything(), ~as.numeric(as.character(.))))
+
+# Sort the columns in alphabetical order by column names
+sorted_col_names18 <- sort(names(ict_cor_18))
+ict_cor_18_sorted <- ict_cor_18[, sorted_col_names18]
+
+# Calculate the correlation matrix for the sorted columns
+cor_matrix_sorted18 <- cor(ict_cor_18_sorted, use = "complete.obs")
+
+# Plot the sorted correlation matrix
+corrplot(cor_matrix_sorted18, method = "square", order = "AOE")
+
+```
+
+## 2. 2018. Correlation of Variables
+
+- **Strong Positive Correlations**: Clusters of strong positive correlations are observed among variables like UM\_E1, UM\_C8g, and UMK\_C8c, suggesting these variables may measure similar underlying constructs. These are suitable clusters for factor analysis.
+    
+- **Limited Negative Correlations**: The correlogram shows few strong negative correlations, indicating minimal opposing relationships within the dataset.
+    
+- **Majority Weak or No Correlation**: Many variable pairs exhibit weak or no correlations, indicating a high degree of independence among numerous variables.
+    
+- **Suitability for Factor Analysis**: The presence of strong correlations in specific clusters, along with many weakly correlated variables, suggests that factor analysis could be effective in reducing dimensionality and identifying underlying factors.
+
+## 3. 2018. Kaiser-Meyer-Olkin measure
+
+
+```{r KMOtest18, echo=FALSE}
+
+kmo_results18 <- KMO(cor_matrix_sorted18)
+
+# Convert the KMO results into a data frame for easier use with kable
+# Assuming kmo_results is well-understood and it contains overall MSA and individual KMO values
+msai_df18 <- as.data.frame(kmo_results18$MSAi)
+names(msai_df18) <- "MSA"
+
+# Assuming kmo_results have been obtained from KMO(cor_matrix)
+sorted_names18 <- sort(names(kmo_results18$MSAi))
+
+# Create a data frame for the KMO results with rounding and sorted variable names
+kmo_df <- data.frame(
+  Variable = c("Overall", sorted_names18),
+  KMO = round(c(kmo_results18$MSA, kmo_results18$MSAi[sorted_names18]), 2)  # Round to 2 decimal places and sort KMO values
+)
+
+```
+
+```{r KMOtest18a, echo=FALSE}
+
+
+# # Display the results in R Markdown using kable
+# kable(msai_df, caption = "KMO Measure of Sampling Adequacy for Individual Variables", format = "markdown") %>%
+#   kable_styling(bootstrap_options = c("striped", "hover"))
+
+kable(kmo_df, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,1)%>%  
+  pack_rows("",2,6)%>%    
+  pack_rows("",7,9) %>%   
+  pack_rows("",10,18)
+
+```
+
+
+## 4. 2018. Kaiser-Meyer-Olkin measure
+
+
+- **Overall KMO (0.76):** Indicates good suitability for factor analysis, with sufficient common variance among variables.
+- **Access Variables (‘A’):**Display a range from moderate to good adequacy,suggesting varied suitability for factor analysis.
+- **Skills Variables (‘S’):** High KMO values (around 0.83) reflect excellent adequacy, ideal for exploring underlying skills constructs.
+- **Usage Variables (‘U’):** High scores (e.g., 0.90 for UC_C8g) show strong cohesion and suitability for identifying usage patterns.
+
+This analysis confirms the dataset’s general readiness for factor analysis,
+highlighting specific variables that show particularly strong potential for
+contributing to meaningful factor solutions, while others might need additional
+evaluation to improve their factorability.
+
+
+## 5. 2018. Bartlett's Test of Sphericity
+
+
+```{r Bartletts18, echo=FALSE}
+
+# Perform Bartlett's Test of Sphericity
+bartlett_test18 <- cortest.bartlett(cor_matrix_sorted18, nrow(ict_cor_18))
+
+# Extract the results
+bartlett_results18 <- data.frame(
+  Statistic = round(bartlett_test18$chisq, 3),
+  Degrees_of_Freedom = bartlett_test18$df,
+  p_Value = round(bartlett_test18$p.value, 3)
+)
+
+kable(bartlett_results18, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) 
+```
+
+
+- **Chi-square Statistic**: The high value of 152139.
+- **Degrees of Freedom**: The test used 136 degrees of freedom.
+- **P-Value**: The p-value is 0, indicating a statistically significant result.
+
+These findings robustly reject the null hypothesis, affirming that there are significant correlations among the variables. This confirms the dataset's suitability for factor analysis, indicating a strong presence of meaningful correlations suitable for extracting underlying factors.
+
+## 6. 2018.Cronbach’s Alpha 
+
+```{r alpha18, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+# Calculate Cronbach's alpha for the first 17 variables
+overall_alpha <- alpha(ict_cor_18[, 1:17], check.keys = TRUE)
+
+
+# Indices for continuous variables
+cont_indices <- c(1, 6, 8)
+
+
+# Indices for binary variables - all the first 17 except the continuous ones
+binary_indices <- setdiff(1:17, cont_indices)
+
+# Calculate Cronbach's alpha for continuous variables
+cont_alpha <- alpha(ict_cor_18[, cont_indices], check.keys = TRUE)
+
+ict_cor_18$S_B5a <- ifelse(ict_cor_18$S_B5a == 1, 0, 1)
+
+# Recalculate Cronbach's alpha for binary variables with recoded item
+binary_alpha <- alpha(ict_cor_18[, binary_indices], check.keys = TRUE)
+
+
+# # Calculate Cronbach's alpha for binary variables
+# binary_alpha <- alpha(ict_cor_18[, binary_indices])
+
+```
+
+
+```{r alpha_results18, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+
+# Create a data frame for displaying results
+alpha_results_df18 <- data.frame(
+  Category = c("Overall", "Continuous Variables", "Binary Variables"),
+  Cronbach_Alpha = c(overall_alpha$total$raw_alpha, 
+                     cont_alpha$total$raw_alpha, 
+                     binary_alpha$total$raw_alpha)
+)
+
+# Use kable to create a table
+kable(alpha_results_df18, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) 
+
+```
+
+- **Overall Cronbach's Alpha (0.7691)**: Indicates good internal consistency across the dataset, suitable for reliable analyses.
+- **Continuous Variables (0.8471)**: Show excellent reliability, demonstrating cohesive measurement of underlying constructs.
+- **Binary Variables (0.7416)**: Present good reliability, though slightly lower than for continuous variables, still indicating consistency in measurement.
+
+
+## 1. 2019. Correlation of Variables 
+```{r corr_2019, echo=FALSE}
+
+ict_19 <- ict_combined %>% dplyr::filter(year == 2019)
+
+# Select columns by index and convert them to numeric
+ict_cor_19 <- ict_19 %>%
+  dplyr::select(3:19) %>%
+  dplyr::mutate(across(everything(), ~as.numeric(as.character(.))))
+
+# Sort the columns in alphabetical order by column names
+sorted_col_names19 <- sort(names(ict_cor_19))
+ict_cor_19_sorted <- ict_cor_19[, sorted_col_names19]
+
+# Calculate the correlation matrix for the sorted columns
+cor_matrix_sorted19 <- cor(ict_cor_19_sorted, use = "complete.obs")
+
+# Plot the sorted correlation matrix
+corrplot(cor_matrix_sorted19, method = "square", order = "AOE")
+
+```
+
+
+## 2. 2019. Correlation of Variables 
+
+- **Strong Positive Correlations**: Some variables exhibit strong positive correlations, indicating shared underlying factors suitable for grouping in factor analysis.
+- **Limited Negative Correlations**: The dataset shows minimal strong negative correlations, simplifying factor analysis interpretations.
+- **Majority Weak or No Correlation**: Many variables demonstrate weak or no correlations, indicating independence and suggesting a complex, multidimensional dataset.
+-  **Suitability for Factor Analysis**: The identification of correlated variable clusters indicates that factor analysis is appropriate. 
+
+## 3. 2019. Kaiser-Meyer-Olkin measure
+
+
+```{r KMOtest19, echo=FALSE}
+
+kmo_results19 <- KMO(cor_matrix_sorted19)
+
+# Convert the KMO results into a data frame for easier use with kable
+# Assuming kmo_results is well-understood and it contains overall MSA and individual KMO values
+msai_df19 <- as.data.frame(kmo_results19$MSAi)
+names(msai_df19) <- "MSA"
+
+# Assuming kmo_results have been obtained from KMO(cor_matrix)
+sorted_names19 <- sort(names(kmo_results19$MSAi))
+
+# Create a data frame for the KMO results with rounding and sorted variable names
+kmo_df <- data.frame(
+  Variable = c("Overall", sorted_names19),
+  KMO = round(c(kmo_results19$MSA, kmo_results19$MSAi[sorted_names19]), 2)  # Round to 2 decimal places and sort KMO values
+)
+
+```
+
+```{r KMOtest19a, echo=FALSE}
+
+
+# # Display the results in R Markdown using kable
+# kable(msai_df, caption = "KMO Measure of Sampling Adequacy for Individual Variables", format = "markdown") %>%
+#   kable_styling(bootstrap_options = c("striped", "hover"))
+
+kable(kmo_df, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,1)%>%  
+  pack_rows("",2,6)%>%    
+  pack_rows("",7,9) %>%   
+  pack_rows("",10,18)
+
+```
+
+## 4. 2019. Kaiser-Meyer-Olkin measure
+
+- **Overall KMO (0.79):** Indicates good suitability for factor analysis, with sufficient common variance among variables.
+- **Access Variables (‘A’):**Display a range from moderate to good adequacy,suggesting varied suitability for factor analysis.
+- **Skills Variables (‘S’):** High KMO values (around 0.85) reflect excellent adequacy, ideal for exploring underlying skills constructs.
+- **Usage Variables (‘U’):** High scores (e.g., 0.92 for UC_C8g) show strong cohesion and suitability for identifying usage patterns.
+
+This analysis confirms the dataset’s general readiness for factor analysis,
+highlighting specific variables that show particularly strong potential for
+contributing to meaningful factor solutions, while others might need additional
+evaluation to improve their factorability.
+
+## 5. 2019. Bartlett's Test of Sphericity
+
+
+```{r Bartletts19, echo=FALSE}
+
+# Perform Bartlett's Test of Sphericity
+bartlett_test19 <- cortest.bartlett(cor_matrix_sorted19, nrow(ict_cor_19))
+
+# Extract the results
+bartlett_results19 <- data.frame(
+  Statistic = round(bartlett_test19$chisq, 3),
+  Degrees_of_Freedom = bartlett_test19$df,
+  p_Value = round(bartlett_test19$p.value, 3)
+)
+
+kable(bartlett_results19, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) 
+```
+
+- **Chi-square Statistic**: The high value of 105280.
+- **Degrees of Freedom**: The test used 136 degrees of freedom.
+- **P-Value**: The p-value is 0, indicating a statistically significant result.
+
+These findings robustly reject the null hypothesis, affirming that there are significant correlations among the variables. This confirms the dataset's suitability for factor analysis, indicating a strong presence of meaningful correlations suitable for extracting underlying factors.
+
+## 6. 2019.Cronbach’s Alpha 
+
+```{r alpha19, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+# Calculate Cronbach's alpha for the first 17 variables
+overall_alpha <- alpha(ict_cor_19[, 1:17], check.keys = TRUE)
+
+
+# Indices for continuous variables
+cont_indices <- c(1, 6, 8)
+
+
+# Indices for binary variables - all the first 17 except the continuous ones
+binary_indices <- setdiff(1:17, cont_indices)
+
+# Calculate Cronbach's alpha for continuous variables
+cont_alpha <- alpha(ict_cor_19[, cont_indices], check.keys = TRUE)
+
+ict_cor_19$S_B5a <- ifelse(ict_cor_19$S_B5a == 1, 0, 1)
+
+# Recalculate Cronbach's alpha for binary variables with recoded item
+binary_alpha <- alpha(ict_cor_19[, binary_indices], check.keys = TRUE)
+
+
+# # Calculate Cronbach's alpha for binary variables
+# binary_alpha <- alpha(ict_cor_19[, binary_indices])
+
+```
+
+
+```{r alpha_results19, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+
+
+# Create a data frame for displaying results
+alpha_results_df19 <- data.frame(
+  Category = c("Overall", "Continuous Variables", "Binary Variables"),
+  Cronbach_Alpha = c(overall_alpha$total$raw_alpha, 
+                     cont_alpha$total$raw_alpha, 
+                     binary_alpha$total$raw_alpha)
+)
+
+# Use kable to create a table
+kable(alpha_results_df19, "latex", longtable = T, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) 
+
+```
+
+- **Overall Cronbach's Alpha (0.8079)**: Indicates good internal consistency across the dataset, suitable for reliable analyses.
+- **Continuous Variables (0.8599)**: Show excellent reliability, demonstrating cohesive measurement of underlying constructs.
+- **Binary Variables (0.7806)**: Present good reliability, though slightly lower than for continuous variables, still indicating consistency in measurement.
