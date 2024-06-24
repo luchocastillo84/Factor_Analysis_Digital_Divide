@@ -1,5 +1,5 @@
 ---
-title: "Summary Statistics Sectoral Level"
+title: "Summary Statistics Macro Sectors"
 author: "Luis Carlos Castillo"
 date: "`r Sys.Date()`"
 header-includes:
