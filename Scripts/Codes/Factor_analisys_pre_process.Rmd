@@ -2,6 +2,9 @@
 title: "Tests Before Factor Analysis"
 author: "Luis Carlos Castillo"
 date: "`r Sys.Date()`"
+institute: |
+  | 
+  | University of Urbino and Universty of Bremen
 fontsize: 9pt
 header-includes:
   - \usepackage{booktabs}
@@ -56,6 +59,8 @@ knitr::opts_knit$set(kable.force.latex = TRUE)
 load(here("Data", "Processed", "ICT_Combined.rda"))
 # load(here("Scripts", "Environments", "CI_DDtot.RData"))
 
+options(scipen=999)
+
 ict_combined$A2_A2 <- ict_combined$A2_A2/ 100
 ict_combined$A2_C2 <- ict_combined$A2_C2/ 100
 ict_combined$A2_C6 <- ict_combined$A2_C6/ 100
@@ -72,7 +77,7 @@ the composite index. It includes the following:
 
 ## Data Preparation for Factor Analysis II
 
-- **KMO Test:** The Kaiser-Meyer-Olkin measure of sampling adequacy tests whether the partial correlations among variables are small. A high KMO value (close to 1) suggests that a factor analysis may be useful with your data because the partial correlations are negligible.
+
 - **Bartlett's Test of Sphericity:** This test checks whether the correlation matrix is an identity matrix, which would indicate that the variables are unrelated and unsuitable for structure detection. A significant result from Bartlett’s test supports the factorability of the correlation matrix.
 - **Cronbach's Alpha:** This statistic measures the overall reliability or internal consistency of a set of scale or test items. It helps to assess whether a set of items can reliably measure an unobserved construct, ensuring that the dimensions extracted from factor analysis are reliable.
 
@@ -94,7 +99,7 @@ subsets_2014 <- subsetting_digidivide(data =  ict_combined,
 
 A_data_2014 <- subsets_2014$A_data
 
-A_data_2014 <- A_data_2014[, -c(3, 6)]
+
 
 # Use lapply to loop over the selected columns and convert them to numeric
 # Ensure to reference the correct object and handle data types appropriately
@@ -103,7 +108,7 @@ A_data_2014[] <- lapply(A_data_2014, function(x) {
 })
 
 # Sort the column names in alphabetical order
-sorted_col_namesA14 <- sort(names(A_data_2014[, 1:7]))
+sorted_col_namesA14 <- sort(names(A_data_2014[, 1:9]))
 
 # Reorder the data frame according to the sorted column names
 A_data_2014_sorted <- A_data_2014[, sorted_col_namesA14]
@@ -139,10 +144,6 @@ kmo_df <- data.frame(
 )
 
 ```
-
-
-
-
 
 
 

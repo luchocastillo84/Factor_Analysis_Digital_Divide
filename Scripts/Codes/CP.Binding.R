@@ -7,8 +7,6 @@ library(here)
 library(git2r)
 library(visdat)
 library(naniar)
-library(chatgpt)
-library(gptstudio)
 require(devtools)
 library(caret)
 library(mice)
@@ -1183,6 +1181,8 @@ summary(ict_combined)
 
 library(psych)
 
+load(file = here("Data", "Processed", "ICT_Combined.rda"))
+
 # Define the columns to exclude explicitly
 excluded_columns <- c("ateco")
 excluded_columns1 <- c("strata","size_emp", "size_rev", 
@@ -1198,7 +1198,7 @@ patt <- "^A|^S|^U|^size_|^sme_|^mac_|^year"
 ict_combined_tests <- process_data2FA(ict_combined, patt = patt, encode = T )
 
 
-continuous_vars <- c("A2_A2", "A2_C2", "A2_C6")
+continuous_vars <- c("A2_A2", "A2_C2")
 binary_vars <- setdiff(names(ict_combined_tests), c(continuous_vars, "year"))
 
 

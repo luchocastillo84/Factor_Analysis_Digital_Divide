@@ -1,6 +1,9 @@
 ---
 title: "Summary Statistics Regional Level"
 author: "Luis Carlos Castillo"
+institute: |
+  | 
+  | University of Urbino and Universty of Bremen
 date: "`r Sys.Date()`"
 header-includes:
 - \usepackage{booktabs}
@@ -40,38 +43,28 @@ knitr::opts_knit$set(kable.force.latex = TRUE)
 
 load(here("Data", "Processed", "ICT_Combined.rda"))
 
+# Define the new order of the factor levels based on geographic proximity
+new_order <- c("Northwest", "Northeast", "Central", "South", "Insular")
+
+# Reorder the factor levels
+ict_combined$region <- factor(ict_combined$region, levels = new_order)
+
 counts_region_by_year <- ict_combined %>%
   dplyr::group_by(year, region) %>%
   dplyr::summarise(count = n(), .groups = 'drop') %>%
   dplyr::group_by(year) %>%
   dplyr::mutate(total = sum(count),
                 props = round(count / total * 100, 2)) 
+
+
+
 ```
 
 
 
+## Count of Firms by Regions
 
-## Why do we aggregate into macro sectors?
-
-- **Enhanced Analytical Efficiency:** Aggregation simplifies data, enabling quicker and easier macroeconomic analysis, crucial for strategic decision-making.
-- **Improved Comparative Analysis:** Macro sectors reduce variability, facilitating easier comparisons and benchmarking across economic dimensions, which enhances policy and investment strategies.
-- **Streamlined Resource Allocation:** Aggregating sectors provides a clear overview of economic performance, aiding in more informed and effective resource distribution.
-- **Simplified Communication:** The consolidation into macro sectors simplifies economic data presentation, making it more accessible and easier to understand for a wider audience.
-
-## Limitations of aggregating sectors
-
-- **Loss of Detailed Insights:** Aggregation may overlook critical sector-specific details and variations, potentially leading to less informed decisions.
-- **Risk of Overgeneralization:** Broad categories can obscure the unique characteristics and needs of different industries, possibly resulting in unsuitable policies or strategies.
-- **Masking of Intra-sector Disparities:** Aggregation can hide performance differences within sectors, potentially leading to misinformed assessments of economic health.
-- **Impact on Statistical and Analytical Methods:** Could affect the robustness of statistical analyses. Significant variations within macro sectors can lead to misleading averages or other statistical measures.
-
-## Macro Sector Mapping
-
-
-
-## Count of Firms by Macro Sector by year
-
-```{r mac_sectors_by_year, echo=FALSE}
+```{r regions_by_year, echo=FALSE}
 
 # # Joining sector names to the original data
 # ict_combined_mac <- left_join(ict_combined, sectors, by = "ateco_1")
@@ -84,43 +77,43 @@ ict_summary <- ict_combined %>%
 
 
 # Pivot the data to wide format
-ict_wide_mac <- ict_summary %>%
+ict_wide_reg <- ict_summary %>%
   pivot_wider(
     names_from = year,              # Define new column names from 'year'
     values_from = count,            # Fill the new columns with values from 'count'
     values_fill = list(count = 0))   # Fill missing values with 0
 
-kable(ict_wide_mac, booktabs = T) %>%
+kable(ict_wide_reg, booktabs = T) %>%
   kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
   pack_rows("",1,5)
 
 ```
 
 
-## Percentage of Firms by Macro Sectors by Year
+## Percentage of Firms by Regions
 
-```{r sec_props, echo=FALSE}
+```{r reg_props, echo=FALSE}
 
 
 # Calculate total companies per year for normalization
-year_totals_mac <- ict_combined %>%
+year_totals_reg <- ict_combined %>%
   group_by(year) %>%
   summarise(total_count = n(), .groups = 'drop')
 
 # Join the totals back to the summary data
-ict_summary_mac <- left_join(ict_summary, year_totals_mac, by = "year")
+ict_summary_reg <- left_join(ict_summary, year_totals_reg, by = "year")
 
 
 # Calculate proportions
-ict_summary_mac <- ict_summary_mac %>%
+ict_summary_reg <- ict_summary_reg %>%
   mutate(proportion = round(count / total_count * 100,2))
 
 
-ict_summary_mac1 <- ict_summary_mac %>%
+ict_summary_reg1 <- ict_summary_reg %>%
   mutate(proportion = round(count / total_count * 100,2)) %>%
   dplyr::select(region, year, proportion)  # Select only the columns needed for pivoting
 
-ict_wide_mac_prop <- ict_summary_mac1 %>%
+ict_wide_reg_prop <- ict_summary_reg1 %>%
   pivot_wider(
     names_from = year,              # Define new column names from 'year'
     values_from = proportion,       # Fill the new columns with values from 'proportion'
@@ -128,7 +121,7 @@ ict_wide_mac_prop <- ict_summary_mac1 %>%
 
 
 # Use kable to format the wide table for LaTeX
-kable(ict_wide_mac_prop, booktabs = TRUE) %>%
+kable(ict_wide_reg_prop, booktabs = TRUE) %>%
   kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%
   pack_rows("", 1, 5)
 
@@ -138,7 +131,7 @@ kable(ict_wide_mac_prop, booktabs = TRUE) %>%
 
 
 
-## Counts of Firms by Macro Sectors by Size 
+## Counts of Firms Size by Regions
 
 
 ```{r size, echo=FALSE}
@@ -146,14 +139,14 @@ kable(ict_wide_mac_prop, booktabs = TRUE) %>%
 
 # Recode and count observations, then calculate proportions
 
-counts_size_by_mac <- ict_combined %>%
+counts_size_by_reg <- ict_combined %>%
   dplyr::group_by(year, region, sme_rev) %>%
   dplyr::summarise(count = n(), .groups = 'drop') %>%
   dplyr::group_by(year) %>%
   dplyr::mutate(total = sum(count),
                 props = round(count / total, 3)) 
 
-ict_wide_mac_count <- counts_size_by_mac %>%
+ict_wide_reg_count <- counts_size_by_reg %>%
   pivot_wider(
     id_cols = c(region, sme_rev),  # Keep 'macro_sector' and 'size' as row identifiers
     names_from = year,                # Create new column names from 'year'
@@ -161,7 +154,7 @@ ict_wide_mac_count <- counts_size_by_mac %>%
     values_fill = list(count = 0)     # Fill missing values with 0 if there's no count for a given year
   )
 
-kable(ict_wide_mac_count, booktabs = T) %>%
+kable(ict_wide_reg_count, booktabs = T) %>%
   kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
   pack_rows("",1,2) %>%   
   pack_rows("",3,4) %>%   
@@ -172,14 +165,76 @@ kable(ict_wide_mac_count, booktabs = T) %>%
 ```
 
 
-## Percentage of Firms by Macro Sectors by Year
+## Percentage of Firms Size by Regions
 
-```{r sec_props_by_size, echo=FALSE}
+```{r reg_props_by_size, echo=FALSE}
+
+
+ict_summary_reg1 <- counts_size_by_reg %>%
+  dplyr::mutate(props = round(count / total * 100,2)) %>%
+  dplyr::select(region, sme_rev, year, props)  # Select only the columns needed for pivoting
+
+ict_wide_reg_prop <- ict_summary_reg1 %>%
+  pivot_wider(
+    names_from = year,              # Define new column names from 'year'
+    values_from = props,       # Fill the new columns with values from 'proportion'
+    values_fill = list(props = 0))  # Fill missing values with 0
+
+
+# Use kable to format the wide table for LaTeX
+kable(ict_wide_reg_prop, booktabs = TRUE) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,2) %>%   
+  pack_rows("",3,4) %>%   
+  pack_rows("",5,6) %>%   
+  pack_rows("",7,8) %>%   
+  pack_rows("",9,10)
+
+```
+
+
+## Counts of Firms Macro Sectors by Regions
+
+```{r count_by_mac_sec, echo=FALSE}
+# Count the observations of each level of CLAD4 grouped by year
+
+# Recode and count observations, then calculate proportions
+
+counts_size_by_mac <- ict_combined %>%
+  dplyr::group_by(year, region, mac_sec) %>%
+  dplyr::summarise(count = n(), .groups = 'drop') %>%
+  dplyr::group_by(year) %>%
+  dplyr::mutate(total = sum(count),
+                props = round(count / total, 3)) 
+
+ict_wide_mac_count <- counts_size_by_mac %>%
+  pivot_wider(
+    id_cols = c(region, mac_sec),  # Keep 'macro_sector' and 'size' as row identifiers
+    names_from = year,                # Create new column names from 'year'
+    values_from = count,              # Fill the new columns with values from 'count'
+    values_fill = list(count = 0)     # Fill missing values with 0 if there's no count for a given year
+  )
+
+kable(ict_wide_mac_count, booktabs = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
+  pack_rows("",1,4) %>%   
+  pack_rows("",5,8) %>%   
+  pack_rows("",9,12) %>%   
+  pack_rows("",13,16)%>%   
+  pack_rows("",17,20)
+
+```
+
+
+## Proportions of Firms Macro Sectors by Regions
+
+
+```{r props_by_mac_sec, echo=FALSE}
 
 
 ict_summary_mac1 <- counts_size_by_mac %>%
   dplyr::mutate(props = round(count / total * 100,2)) %>%
-  dplyr::select(region, sme_rev, year, props)  # Select only the columns needed for pivoting
+  dplyr::select(region, mac_sec, year, props)  # Select only the columns needed for pivoting
 
 ict_wide_mac_prop <- ict_summary_mac1 %>%
   pivot_wider(
@@ -191,12 +246,11 @@ ict_wide_mac_prop <- ict_summary_mac1 %>%
 # Use kable to format the wide table for LaTeX
 kable(ict_wide_mac_prop, booktabs = TRUE) %>%
   kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
-  pack_rows("",1,2) %>%   
-  pack_rows("",3,4) %>%   
-  pack_rows("",5,6) %>%   
-  pack_rows("",7,8) %>%   
-  pack_rows("",9,10)
+  pack_rows("",1,4) %>%   
+  pack_rows("",5,8) %>%   
+  pack_rows("",9,12) %>%   
+  pack_rows("",13,16)%>%   
+  pack_rows("",17,20)
 
 ```
-
 
