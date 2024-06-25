@@ -1,3 +1,5 @@
+
+
 # Define the function
 process_data2FA <- function(data, patt, encode = TRUE) {
   # Search for the pattern in the df

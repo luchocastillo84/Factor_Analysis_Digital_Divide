@@ -1,5 +1,5 @@
 ---
-title: "Summary Statistics of 26 Variables by Firm"
+title: "Summary Statistics of 29 Variables by Firm"
 author: "Luis Carlos Castillo"
 date: "`r Sys.Date()`"
 institute: |
@@ -44,7 +44,16 @@ knitr::opts_knit$set(kable.force.latex = TRUE)
 
 load(here("Data", "Processed", "ICT_Combined.rda"))
 
+ict_combined$A2_A2 <- ict_combined$A2_A2/ 100
+ict_combined$A2_C2 <- ict_combined$A2_C2/ 100
+ict_combined$A2_C6 <- ict_combined$A2_C6/ 100
+
 ```
+
+## Introduction
+
+This report details the active variables used for factor extraction. Variables with variance below 0.10 were excluded, as they do not contribute meaningful information to the results. This selection criterion ensures that the included variables provide significant insights into the underlying data structure and the constructs they represent (Access, Skills, and Usage).
+
 
 ## Firms Size Using 3 Levels Measured by Revenue
 
@@ -53,12 +62,16 @@ load(here("Data", "Processed", "ICT_Combined.rda"))
 
 # Recode and count observations, then calculate proportions
 
+library(dplyr)
+
 counts_clad4_by_year <- ict_combined %>%
-  dplyr::group_by(year, size_rev) %>%
-  dplyr::summarise(count = n(), .groups = 'drop') %>%
-  dplyr::group_by(year) %>%
-  dplyr::mutate(total = sum(count),
-                props = round(count / total, 3)) 
+  group_by(year, size_rev) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  group_by(year) %>%
+  mutate(total = sum(count),
+         props = round(count / total, 3),
+         variance = props * (1 - props)) # Add the variance calculation
+
 
 kable(counts_clad4_by_year, "latex", longtable = F, booktabs = T, escape = T) %>%
   kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   pack_rows("",1,3) %>% pack_rows("",4,6) %>% pack_rows("",7,9) %>% pack_rows("",10,12) %>% pack_rows("",13,15) %>% pack_rows("",16,18)
@@ -84,18 +97,22 @@ counts_clad4_by_year1 <- ict_combined %>%
                 props = round(count / total, 3)) 
 
 kable(counts_clad4_by_year1, "latex", longtable = F, booktabs = T, escape = T) %>%
-  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   pack_rows("",1,2) %>% pack_rows("",3,4) %>% pack_rows("",5,6) %>% pack_rows("",7,8) %>% pack_rows("",9,10) 
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   pack_rows("",1,2) %>% pack_rows("",3,4) %>% pack_rows("",5,6) %>% pack_rows("",7,8) %>% pack_rows("",9,10) %>% pack_rows("",11,12)
 
 ```
+
+## Control Variables Used for Factor Extraction
+
+In this study, firm size using 3 levels, measured by revenue, was included as an active variable in the factor analysis to control for its influence on other variables. This approach ensures that the extracted factors account for size-related variations, enhancing their interpretability and providing a comprehensive understanding of the data. Incorporating firm size allows for a more accurate and representative analysis of the underlying data structure.
 
 
 ## Variables 
 
-In total there are 26 variables use to extract the factors that represent each construct access, skills, and usage.
+In total there are 29 variables use to extract the factors that represent each construct access, skills, and usage. Three control variables representing the firm size were included.
 
- - For the access index 6 variables 
- - For the skills index 9 variables
- - For the usage index 11 variables
+ - For the access index 6 variables + 3 size variables (small, medium, large)
+ - For the skills index 9 variables + 3 size variables (small, medium, large)
+ - For the usage index 11 variables + 3 size variables (small, medium, large)
 
 
 ## ACCESS variables I
@@ -110,6 +127,8 @@ These variables include continuous and binary variables' in total there are 6 va
 
 ```{r A1_B2b, echo=FALSE}
 
+library(dplyr)
+
 get_binary_summary_stats_by_group <- function(df, group_var, summary_var) {
   # Ensure the binary variable is treated as numeric
   df[[summary_var]] <- as.numeric(as.character(df[[summary_var]]))
@@ -118,19 +137,17 @@ get_binary_summary_stats_by_group <- function(df, group_var, summary_var) {
     group_by(.data[[group_var]]) %>%
     summarise(
       count = n(),
-      prop = round(mean(.data[[summary_var]], na.rm = TRUE), 2),
-      std_dev = round(sd(.data[[summary_var]], na.rm = TRUE), 2),
-      num_0s = sum(.data[[summary_var]] == 0, na.rm = TRUE),
-      num_1s = sum(.data[[summary_var]] == 1, na.rm = TRUE),
-      prop_0s = round(mean(.data[[summary_var]] == 0, na.rm = TRUE), 2),
-      prop_1s = round(mean(.data[[summary_var]] == 1, na.rm = TRUE), 2),
+      prop_1s = round(mean(.data[[summary_var]], na.rm = TRUE), 4),
+      variance = round(prop_1s * (1 - prop_1s), 4), # Variance for binary variables
+      std_dev = round(sd(.data[[summary_var]], na.rm = TRUE), 4),
       .groups = 'drop'
     ) %>%
     mutate(
-      lo_95_CI = round(prop - 1.96 * sqrt(prop * (1 - prop) / count), 2),
-      up_95_CI = round(prop + 1.96 * sqrt(prop * (1 - prop) / count), 2)
+      lo_95_CI = round(prop_1s - 1.96 * sqrt(prop_1s * (1 - prop_1s) / count), 2),
+      up_95_CI = round(prop_1s + 1.96 * sqrt(prop_1s * (1 - prop_1s) / count), 2)
     )
 }
+
 
 # Example usage:
 A1_B2b_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "A1_B2b")
@@ -156,13 +173,16 @@ kable(A1_B2b_summary, "latex", longtable = F, booktabs = T,escape = T) %>%
 
 ```{r A2_A2, echo= F}
 
+
+
 get_summary_continuous_stats_by_group <- function(df, group_var, summary_var) {
   df %>%
     group_by({{ group_var }}) %>%
     summarise(
       count = n(),
-      mean = round(mean({{ summary_var }}, na.rm = TRUE), 2),
-      sd = round(sd({{ summary_var }}, na.rm = TRUE), 2),
+      mean = round(mean({{ summary_var }}, na.rm = TRUE), 4),
+      sd = round(sd({{ summary_var }}, na.rm = TRUE), 4),
+      variance = round(var({{ summary_var }}, na.rm = TRUE), 4), # Added variance calculation
       median = round(median({{ summary_var }}, na.rm = TRUE), 2),
       min = round(min({{ summary_var }}, na.rm = TRUE), 2),
       max = round(max({{ summary_var }}, na.rm = TRUE), 2),
