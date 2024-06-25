@@ -28,6 +28,7 @@ library(ltm)
 library(psych)
 library(reshape2)
 
+load(file = here("Data", "Environments", "ICT_Combined.rda"))
 
 load(file = here("Data", "Processed", "ICT_Combined.rda"))
 
@@ -40,6 +41,7 @@ ict_combined$A2_A2 <- ict_combined$A2_A2/ 100
 ict_combined$A2_C2 <- ict_combined$A2_C2/ 100
 ict_combined$A2_C6 <- ict_combined$A2_C6/ 100
 
+ict_combined <- ict_combined[, -c(7)]
 
 patt <- "^A|^S|^U|^size_|^sme_|^mac_|^year"  
 
@@ -60,7 +62,6 @@ summary(ict_combined_tests)
 variance <- calculate_variance(ict_combined_tests, "year", 
                                continuous_vars, binary_vars)
 
-ict_combined_tests <-  ict_combined_tests[, -5]
 
 summary(ict_combined_tests)
 
@@ -122,10 +123,123 @@ for (year in years) {
   results[[as.character(year)]] <- perform_reliability_analysis(data_subset)
 }
 
-# Print the results for each year
-for (year in years) {
-  cat("\nResults for year", year, ":\n")
-  print(results[[as.character(year)]])
-}
+# # Print the results for each year
+# for (year in years) {
+#   cat("\nResults for year", year, ":\n")
+#   print(results[[as.character(year)]])
+# }
+
+
+## Correlations 2014 ####
+
+##### Access  ####
+
+source(here("Scripts", "Functions", "subsetting_digidivide.R"))
+
+patt <- "^A|^S|^U|^size_rev"
+var2encode <- c("size_rev")
+year <- 2014
+
+
+
+subsets_2014 <- subsetting_digidivide(data =  ict_combined, 
+                                      patt =  patt, 
+                                      var2encode = var2encode,
+                                      year =  year, 
+                                      include_weights = F)
+
+A_data_2014 <- subsets_2014$A_data
+
+
+
+# Use lapply to loop over the selected columns and convert them to numeric
+# Ensure to reference the correct object and handle data types appropriately
+A_data_2014[] <- lapply(A_data_2014, function(x) {
+  if(is.factor(x)) as.numeric(as.character(x)) else as.numeric(x)
+})
+
+# Sort the column names in alphabetical order
+sorted_col_namesA14 <- sort(names(A_data_2014[, 1:9]))
+
+# Reorder the data frame according to the sorted column names
+A_data_2014_sorted <- A_data_2014[, sorted_col_namesA14]
+
+# Calculate the correlation matrix for the sorted columns
+cor_matrix_sortedA14 <- cor(A_data_2014_sorted, use = "complete.obs")
+
+# Plot the sorted correlation matrix
+corrplot(cor_matrix_sortedA14, method = "square", order = "original", tl.col = "red", tl.srt = 45)
+
+
+
+##### Skills  ####
+
+patt <- "^A|^S|^U|^size_rev"
+var2encode <- c("size_rev")
+year <- 2014
+
+
+S_data_2014 <- subsets_2014$S_data
+
+
+
+# Use lapply to loop over the selected columns and convert them to numeric
+# Ensure to reference the correct object and handle data types appropriately
+S_data_2014[] <- lapply(S_data_2014, function(x) {
+  if(is.factor(x)) as.numeric(as.character(x)) else as.numeric(x)
+})
+
+# Sort the column names in alphabetical order
+sorted_col_namesS14 <- sort(names(S_data_2014[, 1:12]))
+
+# Reorder the data frame according to the sorted column names
+S_data_2014_sorted <- S_data_2014[, sorted_col_namesS14]
+
+# Calculate the correlation matrix for the sorted columns
+cor_matrix_sortedS14 <- cor(S_data_2014_sorted, use = "complete.obs")
+
+# Plot the sorted correlation matrix
+corrplot(cor_matrix_sortedS14, method = "square", order = "original", tl.col = "red", tl.srt = 45)
+
+
+
+##### Usage  ####
+
+patt <- "^A|^S|^U|^size_rev"
+var2encode <- c("size_rev")
+year <- 2014
+
+
+S_data_2014 <- subsets_2014$S_data
+
+
+
+# Use lapply to loop over the selected columns and convert them to numeric
+# Ensure to reference the correct object and handle data types appropriately
+S_data_2014[] <- lapply(S_data_2014, function(x) {
+  if(is.factor(x)) as.numeric(as.character(x)) else as.numeric(x)
+})
+
+# Sort the column names in alphabetical order
+sorted_col_namesS14 <- sort(names(S_data_2014[, 1:12]))
+
+# Reorder the data frame according to the sorted column names
+S_data_2014_sorted <- S_data_2014[, sorted_col_namesS14]
+
+# Calculate the correlation matrix for the sorted columns
+cor_matrix_sortedS14 <- cor(S_data_2014_sorted, use = "complete.obs")
+
+# Plot the sorted correlation matrix
+corrplot(cor_matrix_sortedS14, method = "square", order = "original", tl.col = "red", tl.srt = 45)
+
+
+
+
+
+
+
+
+
+
 
   
