@@ -69,21 +69,75 @@ ict_combined$A2_C2 <- ict_combined$A2_C2/ 100
 
 
 This section will present the different statistics and test before constructing 
-the composite index. It includes the following:
+the composite index. It includes the following: 
+
+- **ANOVA (Analysis of Variance) and Chi-Squared tests** are fundamental statistical methods used to assess differences in data. ANOVA evaluates whether there are significant differences in the mean scores of continuous variables across different groups, such as different years. Chi-Squared tests, on the other hand, determine if there are significant differences in the distribution of categorical variables across groups.
+
+  In this study, these tests were applied to evaluate the significant differences in the means and distributions of variables across six years. This evaluation is crucial in the preliminary stages of factor analysis, as it ensures the suitability and consistency of the data. Significant differences highlighted by these tests can indicate variability that might impact the factor analysis. Understanding the data distribution and ensuring data quality through these tests helps validate the assumptions required for factor analysis. Thus, conducting ANOVA and Chi-Squared tests provides a comprehensive understanding of the data, ensuring it is appropriately structured and reliable for subsequent factor analysis.
+  
+## Interpreting the results
+
+Interpreting the results of hypothesis testing involves understanding the null (H0) and alternative (H1) hypotheses. The null hypothesis states there is no significant difference between groups, while the alternative suggests a significant difference exists. We calculate a p-value to test these hypotheses. If the p-value is less than 0.05, we reject the null hypothesis, indicating a significant difference. If it's greater, we fail to reject the null hypothesis, suggesting any differences are likely due to chance.
+
+In this study, rejecting the null hypothesis in ANOVA tests indicates significant differences in mean scores of continuous variables across years. For Chi-Squared tests, it suggests significant differences in the distribution of categorical variables over time. These results help validate the data's variability, ensuring its suitability for factor analysis.
+
+## ANOVA and Chi-Squaredd for ACCESS Over the Six Yeaars
+
+
+```{r ANOVA_A, echo=FALSE}
+
+load(here("Scripts", "Environments", "FactoAnalysisPreProcess.RData"))
+
+rownames(test_results_Access) = NULL
+
+kable(test_results_Access, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   pack_rows("",1,6) %>% pack_rows("",7,9)
+
+```
+
+## Chi-Squaredd for SKILLS Over the Six Yeaars
+
+```{r chi_squ_S, echo=FALSE}
+
+load(here("Scripts", "Environments", "FactoAnalysisPreProcess.RData"))
+
+rownames(test_results_Skills) = NULL
+
+kable(test_results_Skills, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,9) %>% pack_rows("",10,12)
+
+```
+
+
+## Chi-Squaredd for USAGE Over the Six Yeaars
+
+```{r chi_squ_U, echo=FALSE}
+
+load(here("Scripts", "Environments", "FactoAnalysisPreProcess.RData"))
+
+rownames(test_results_Usage) = NULL
+
+kable(test_results_Usage, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,11) %>% pack_rows("",12,14)
+
+```
+
+
+## 
 
 - **Correlation of Variables:** Understanding correlations between variables is foundational in factor analysis. This assessment helps identify whether groups of variables share common patterns or underlying factors, which justifies their reduction into fewer dimensions.
 
 
 - **Internal Consistency and Cronbach’s Alpha:**
 
-Internal Consistency refers to the reliability of items within a scale or test to consistently measure the same underlying construct. It is a crucial aspect of scale reliability and validity. Cronbach’s Alpha is a specific statistic used to measure this internal consistency. It quantifies how well a set of items measure an underlying (unobserved) construct.
+  Internal Consistency refers to the reliability of items within a scale or test to consistently measure the same underlying construct. It is a crucial aspect of scale reliability and validity. Cronbach’s Alpha is a specific statistic used to measure this internal consistency. It quantifies how well a set of items measure an underlying (unobserved) construct.
 
   - Thresholds for Cronbach's Alpha:
     - $\alpha \geq 0.90$: Excellent
     - $0.80 \leq \alpha < 0.90$: Good
     - $0.70 \leq \alpha < 0.80$: Acceptable
 
-A high Cronbach's Alpha indicates that the items are highly correlated and thus reliably measure the same construct. This helps to ensure that the dimensions extracted from factor analysis are reliable.
+  A high Cronbach's Alpha indicates that the items are highly correlated and thus reliably measure the same construct. This helps to ensure that the dimensions extracted from factor analysis are reliable.
 
 ## Data Preparation for Factor Analysis II
 
