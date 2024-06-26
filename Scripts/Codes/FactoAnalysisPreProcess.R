@@ -170,7 +170,7 @@ cor_matrix_sortedA14 <- cor(A_data_2014_sorted, use = "complete.obs")
 # Plot the sorted correlation matrix
 corr_A2014 <- corrplot(cor_matrix_sortedA14, method = "square", order = "original", tl.col = "red", tl.srt = 45)
 
-
+corr_A2014
 
 ##### Skills  ####
 
