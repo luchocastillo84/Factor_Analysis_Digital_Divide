@@ -4,12 +4,12 @@ library(broom)
 
 # Function to perform hypothesis testing
 perform_hypothesis_test <- function(data, continuous_vars = NULL, binary_vars = NULL, alpha = 0.05) {
-  
+
   # Ensure the year variable is a factor
   data <- data %>% mutate(year = as.factor(year))
-  
+
   results <- list()
-  
+
   # Perform ANOVA for continuous variables
   if (!is.null(continuous_vars)) {
     for (var in continuous_vars) {
@@ -33,7 +33,7 @@ perform_hypothesis_test <- function(data, continuous_vars = NULL, binary_vars = 
       }
     }
   }
-  
+
   # Perform chi-squared tests for binary variables
   if (!is.null(binary_vars)) {
     for (var in binary_vars) {
@@ -56,16 +56,18 @@ perform_hypothesis_test <- function(data, continuous_vars = NULL, binary_vars = 
       }
     }
   }
-  
+
   # Combine results into a single data frame
   results_df <- do.call(rbind, results)
-  
+
   return(results_df)
 }
+# # 
+# # # Example usage with your data
+# # # Replace the variable names with actual names from your data
+# # test_results <- perform_hypothesis_test(A_data_combined, 
+# #                                         continuous_vars = c("A2_A2", "A2_C2", "A2_C6"), 
+# #                                         binary_vars = c("A1_B2b", "A2_C5a", "A2_C4_low", "A2_C4_high"))
+# # print(test_results)
 
-# Example usage with your data
-# Replace the variable names with actual names from your data
-test_results <- perform_hypothesis_test(A_data_combined, 
-                                        continuous_vars = c("A2_A2", "A2_C2", "A2_C6"), 
-                                        binary_vars = c("A1_B2b", "A2_C5a", "A2_C4_low", "A2_C4_high"))
-print(test_results)
+

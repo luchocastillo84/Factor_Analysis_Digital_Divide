@@ -28,7 +28,7 @@ library(ltm)
 library(psych)
 library(reshape2)
 
-load(file = here("Data", "Environments", "ICT_Combined.rda"))
+load(file = here("Scripts", "Environments", "FactoAnalysisPreProcess.RData"))
 
 load(file = here("Data", "Processed", "ICT_Combined.rda"))
 
@@ -690,12 +690,73 @@ corr_U2019 <- corrplot(cor_matrix_sortedU19, method = "square", order = "origina
 
 
 
+##### Test to check if each iteration of the survey is statistically different ####
+
+A_combined <- rbind(A_data_2014, A_data_2015, A_data_2016,
+                    A_data_2017, A_data_2018, A_data_2019)
+
+A_combined <- cbind(A_combined, year = as.numeric(as.character(ict_combined$year)))
+
+continuous_vars <- c("A2_A2", "A2_C2")
+binary_varsA <- setdiff(names(A_combined), c(continuous_vars, "year"))
+
+
+ict_combined_tests <- A_combined %>%
+  mutate(across(all_of(continuous_vars), ~ as.numeric(as.character(.)))) %>%
+  mutate(across(all_of(binary_vars), ~ as.numeric(as.character(.))))
+
+options(scipen=999)
+
+test_results_Access <- perform_hypothesis_test(A_combined, 
+                                               continuous_vars, 
+                                               binary_varsA)
+
+test_results_Access$P_Value <- round(test_results_Access$P_Value, 3)
+
+
+###### Skills #### 
+
+S_combined <- rbind(S_data_2014, S_data_2015, S_data_2016,
+                    S_data_2017, S_data_2018, S_data_2019)
+
+
+S_combined <- cbind(S_combined, year = as.numeric(as.character(ict_combined$year)))
+
+
+binary_varsS <- names(S_combined[, 1:12])
 
 
 
 
+options(scipen=999)
+
+test_results_Skills <- perform_chisq_test(S_combined, 
+                                               binary_varsS)
+
+test_results_Skills$P_Value <- round(test_results_Skills$P_Value, 3)
 
 
+
+###### Usage #### 
+
+U_combined <- rbind(U_data_2014, U_data_2015, U_data_2016,
+                    U_data_2017, U_data_2018, U_data_2019)
+
+
+U_combined <- cbind(U_combined, year = as.numeric(as.character(ict_combined$year)))
+
+
+binary_varsU <- names(U_combined[, 1:14])
+
+
+
+
+options(scipen=999)
+
+test_results_Usage <- perform_chisq_test(U_combined, 
+                                          binary_varsU)
+
+test_results_Usage$P_Value <- round(test_results_Usage$P_Value, 3)
 
 
 
