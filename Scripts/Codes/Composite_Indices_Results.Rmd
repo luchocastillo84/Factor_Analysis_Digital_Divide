@@ -1,0 +1,1631 @@
+---
+title: "Composite Indices, Eigenvalues, and Contributions"
+author: "Luis Carlos Castillo"
+date: "`r Sys.Date()`"
+institute: |
+  | 
+  | University of Urbino and Universty of Bremen
+fontsize: 9pt
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{graphicx}
+  - \setbeamerfont{normal text}{size=\tiny} # Adjust this line as needed
+output:
+  beamer_presentation: default
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE}
+#### 0. Load the necessary packages #####
+library(readr)
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(here)
+library(git2r)
+library(visdat)
+library(naniar)
+library(chatgpt)
+library(gptstudio)
+require(devtools)
+library(caret)
+library(mice)
+library(knitr)
+library(kableExtra)
+library(corrplot)
+library(forcats)
+library(DescTools)
+library(fastDummies)
+library(corrplot)
+library(Compind)
+library(lme4)
+library(Matrix)
+library(ltm)
+library(cowplot)
+
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = F, message = F )
+kableExtra.auto_format = FALSE
+knitr.table.format = "latex"
+knitr::opts_knit$set(kable.force.latex = TRUE)
+
+## Functions 
+
+source(here("Scripts", "Functions", "binding_comp_index_dd.R"))
+source(here("Scripts", "Functions", "ci_factor_mca.R"))
+source(here("Scripts", "Functions", "ci_factor_mixed.R"))
+source(here("Scripts", "Functions", "ci_generalized_mean1.R"))
+source(here("Scripts", "Functions", "comp_index_dd_mca.R"))
+source(here("Scripts", "Functions", "comp_index_dd_mixed.R"))
+source(here("Scripts", "Functions", "norm_min_max.R"))
+source(here("Scripts", "Functions", "process_data2FA.R"))
+source(here("Scripts", "Functions", "subsetting_digidivide.R"))
+source(here("Scripts", "Functions", "ci_factor_mca.R"))
+source(here("Scripts", "Functions", "ci_factor_mca.R"))
+
+```
+
+
+```{r weights, echo=FALSE}
+
+load(here("Data", "Processed", "ICT_Combined.rda"))
+
+ict_combined$A2_A2 <- ict_combined$A2_A2/ 100
+ict_combined$A2_C2 <- ict_combined$A2_C2/ 100
+
+ict_combined <- ict_combined[, -c(7)]
+
+## Scheme 11: year,  region, Revenue_K,  sec_name, size_rev
+
+# Calculate weights based on relevant contextual variables
+weights <- ict_combined %>%
+  group_by(year,  region, Revenue_K,  sec_name, size_rev) %>%  # Adjust these variables as needed
+  summarise(count = n(), .groups = 'drop') %>%
+  mutate(total = sum(count),
+         prop = count / total,
+         weight = 1 / prop)
+
+# Normalize weights within each group (year)
+weights <- weights %>%
+  group_by(year) %>%
+  mutate(weight = weight / sum(weight) * n())
+
+# Merge weights back into the original dataset
+ict_combined1 <- ict_combined %>%
+  left_join(weights %>% dplyr::select(year,  region, Revenue_K,  sec_name, size_rev, weight), 
+            by = c("year",  "region", "Revenue_K",  "sec_name", "size_rev"))
+
+
+```
+
+
+## Inclusion of Weights in FAMD and MCA
+
+In this study, weights were incorporated into the FAMD (Factorial Analysis for Mixed Data) and MCA (Multiple Correspondence Analysis) functions to account for the varying sample sizes across different groups. This weighting scheme ensures that the analysis accurately reflects the distribution and importance of each subgroup within the dataset. The weights were applied to balance the influence of different groups, such as:
+
+- **Years**: Accounting for variations in sample sizes across different time periods.
+- **Regions**: Ensuring representation from diverse geographical areas.
+- **Sectors**: Reflecting the distribution of firms across various industry sectors.
+- **Revenue Levels**: Balancing firms with different revenue scales.
+- **Firm Sizes**: Adjusting for the representation of small, medium, and large firms.
+
+By applying these weights, the analysis more accurately represents the population structure, leading to more reliable and generalizable results. The weighting helps mitigate biases that could arise from over- or under-represented groups, thereby enhancing the validity of the factor analysis.
+
+
+## Calculation Process
+
+1. **Group Calculation**: The dataset was divided into subgroups based on year, region, revenue levels, sectors, and firm sizes.
+2. **Count and Proportion**:
+   - The number of observations in each subgroup was counted.
+   - The proportion of each subgroup relative to the total number of observations was calculated.
+3. **Initial Weight Assignment**: Each subgroup was assigned a weight based on the inverse of its proportion, giving more weight to smaller subgroups to balance their influence.
+4. **Normalization**:
+   - The weights were normalized within each year so that they sum to the total number of observations in that year.
+   
+## List of variables by constructs: Access, Skills, and Usage.
+
+### Access
+
+```{r Access, echo=FALSE}
+
+load(file = here("Data", "Processed", "codebook.rda"))
+
+access <- codebook[c(1:6, 27:29), ]
+
+kable(access, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   pack_rows("",1,6) %>% pack_rows("",7,9)
+
+```
+
+
+## 
+
+### Skills
+
+```{r Skills, echo=FALSE}
+
+load(file = here("Data", "Processed", "codebook.rda"))
+
+skills <- codebook[c(7:15, 27:29), ]
+
+kable(skills, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,9) %>% pack_rows("",10,12)
+
+```
+
+##
+
+### Usage
+
+```{r Usage, echo=FALSE}
+
+load(file = here("Data", "Processed", "codebook.rda"))
+
+usage <- codebook[c(16:26, 27:29), ]
+
+kable(usage, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,11) %>% pack_rows("",12,14)
+
+```
+
+##
+
+\centering
+### Composite Indices for 2014
+
+
+
+
+```{r Subsetting2014, echo=FALSE}
+
+patt <- "^A|^S|^U|^size_rev"
+var2encode <- c("size_rev")
+year <- 2014
+
+
+subsets_2014 <- subsetting_digidivide(data =  ict_combined1, 
+                                      patt =  patt, 
+                                      var2encode =  var2encode, 
+                                      year =  year, 
+                                      include_weights = T)
+
+```
+
+## Access 2014 Composite Index
+
+### Eigenvalues Access 2014
+
+```{r Access2014, echo=FALSE}
+
+A_data_2014 <- subsets_2014$A_data
+
+
+results_access_2014w <- comp_index_dd_mixed(data =  A_data_2014, 
+                                           index = "access", 
+                                           year = 2014,
+                                           weights = A_data_2014$weight)
+
+
+eigen_A2014 <- round(eigenvalues_2014_access,4)
+
+
+kable(eigen_A2014, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,9)
+
+
+```
+
+## 
+
+### Screeplot Access 2014
+
+```{r screeplotA2014, echo=FALSE}
+
+scree_plot_2014_access
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Access 2014
+
+```{r 1contrib_A2014, echo=FALSE}
+
+
+
+slide1_plotA2014 <- plot_grid(contrib_2014_access_D1, contrib_2014_access_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotA2014
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Access 2014
+
+```{r 2contrib_A2014, echo=FALSE}
+slide2_plotA2014 <- plot_grid(contrib_2014_access_D3, contrib_2014_access_D4, ncol = 2, labels = "AUTO")
+
+slide2_plotA2014
+
+```
+
+
+##
+
+### Index distribution Access 2014
+
+```{r hist_A2014, echo=FALSE}
+
+hist_2014_access
+
+
+```
+
+
+## Skills 2014 Composite Index 
+
+### Eigenvalues Skills 2014
+
+```{r Skills2014, echo=FALSE}
+
+S_data_2014 <- subsets_2014$S_data
+
+
+results_skills_2014w <- comp_index_dd_mixed(data =  S_data_2014, 
+                                            index = "skills", 
+                                            year = 2014,
+                                            weights = S_data_2014$weight)
+
+
+eigen_S2014 <- round(eigenvalues_2014_skills,4)
+
+
+kable(eigen_S2014, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,12)
+
+
+```
+
+## 
+
+### Screeplot Skills 2014
+
+```{r screeplotS2014, echo=FALSE}
+
+scree_plot_2014_skills
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Skills 2014
+
+```{r 1contrib_S2014, echo=FALSE}
+
+
+
+slide1_plotS2014 <- plot_grid(contrib_2014_skills_D1, contrib_2014_skills_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotS2014
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Skills 2014
+
+```{r 2contrib_S2014, echo=FALSE}
+slide2_plotS2014 <- plot_grid(contrib_2014_skills_D3, contrib_2014_skills_D4, ncol = 2, labels = "AUTO")
+slide2_plotS2014
+```
+
+
+##
+
+### Index distribution Skills 2014
+
+```{r hist_S2014, echo=FALSE}
+
+hist_2014_skills
+
+
+```
+
+
+## Usage 2014 Composite Index 
+
+
+### Eigenvalues Usage 2014
+
+```{r Usage2014, echo=FALSE}
+
+U_data_2014 <- subsets_2014$U_data
+
+
+results_usage_2014w <- comp_index_dd_mixed(data =  U_data_2014, 
+                                            index = "usage", 
+                                            year = 2014,
+                                            weights = U_data_2014$weight)
+
+
+eigen_U2014 <- round(eigenvalues_2014_usage,4)
+
+
+kable(eigen_U2014, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,14)
+
+
+```
+
+## 
+
+### Screeplot Usage 2014
+
+```{r screeplotU2014, echo=FALSE}
+
+scree_plot_2014_usage
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Usage 2014
+
+```{r 1contrib_U2014, echo=FALSE}
+
+
+
+slide1_plotU2014 <- plot_grid(contrib_2014_usage_D1, contrib_2014_usage_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotU2014
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Usage 2014
+
+```{r 2contrib_U2014, echo=FALSE}
+slide2_plotU2014 <- plot_grid(contrib_2014_usage_D3, contrib_2014_usage_D4, ncol = 2, labels = "AUTO")
+slide2_plotU2014
+```
+
+
+##
+
+### Index distribution Usage 2014
+
+```{r hist_U2014, echo=FALSE}
+
+hist_2014_usage
+
+
+```
+
+
+##
+
+\centering
+### Composite Indices for 2015
+
+
+```{r Subsetting2015, echo=FALSE}
+
+patt <- "^A|^S|^U|^size_rev"
+var2encode <- c("size_rev")
+year <- 2015
+
+
+subsets_2015 <- subsetting_digidivide(data =  ict_combined1, 
+                                      patt =  patt, 
+                                      var2encode =  var2encode, 
+                                      year =  year, 
+                                      include_weights = T)
+
+```
+
+## Access 2015 Composite Index 
+
+### Eigenvalues Access 2015
+
+```{r Access2015, echo=FALSE}
+
+A_data_2015 <- subsets_2015$A_data
+
+
+results_access_2015w <- comp_index_dd_mixed(data =  A_data_2015, 
+                                            index = "access", 
+                                            year = 2015,
+                                            weights = A_data_2015$weight)
+
+
+eigen_A2015 <- round(eigenvalues_2015_access,4)
+
+
+kable(eigen_A2015, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,9)
+
+
+```
+
+## 
+
+### Screeplot Access 2015
+
+```{r screeplotA2015, echo=FALSE}
+
+scree_plot_2015_access
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Access 2015
+
+```{r 1contrib_A2015, echo=FALSE}
+
+
+
+slide1_plotA2015 <- plot_grid(contrib_2015_access_D1, contrib_2015_access_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotA2015
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Access 2015
+
+```{r 2contrib_A2015, echo=FALSE}
+slide2_plotA2015 <- plot_grid(contrib_2015_access_D3, contrib_2015_access_D4, ncol = 2, labels = "AUTO")
+
+slide2_plotA2015
+
+```
+
+
+##
+
+### Index distribution Access 2015
+
+```{r hist_A2015, echo=FALSE}
+
+hist_2015_access
+
+
+```
+
+
+## Skills 2015 Composite Index 
+
+### Eigenvalues Skills 2015
+
+```{r Skills2015, echo=FALSE}
+
+S_data_2015 <- subsets_2015$S_data
+
+
+results_skills_2015w <- comp_index_dd_mixed(data =  S_data_2015, 
+                                            index = "skills", 
+                                            year = 2015,
+                                            weights = S_data_2015$weight)
+
+
+eigen_S2015 <- round(eigenvalues_2015_skills,4)
+
+
+kable(eigen_S2015, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,12)
+
+
+```
+
+## 
+
+### Screeplot Skills 2015
+
+```{r screeplotS2015, echo=FALSE}
+
+scree_plot_2015_skills
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Skills 2015
+
+```{r 1contrib_S2015, echo=FALSE}
+
+
+
+slide1_plotS2015 <- plot_grid(contrib_2015_skills_D1, contrib_2015_skills_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotS2015
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Skills 2015
+
+```{r 2contrib_S2015, echo=FALSE}
+slide2_plotS2015 <- plot_grid(contrib_2015_skills_D3, contrib_2015_skills_D4, ncol = 2, labels = "AUTO")
+slide2_plotS2015
+```
+
+
+##
+
+### Index distribution Skills 2015
+
+```{r hist_S2015, echo=FALSE}
+
+hist_2015_skills
+
+
+```
+
+
+## Usage 2015 Composite Index 
+
+
+### Eigenvalues Usage 2015
+
+```{r Usage2015, echo=FALSE}
+
+U_data_2015 <- subsets_2015$U_data
+
+
+results_usage_2015w <- comp_index_dd_mixed(data =  U_data_2015, 
+                                           index = "usage", 
+                                           year = 2015,
+                                           weights = U_data_2015$weight)
+
+
+eigen_U2015 <- round(eigenvalues_2015_usage,4)
+
+
+kable(eigen_U2015, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,14)
+
+
+```
+
+## 
+
+### Screeplot Usage 2015
+
+```{r screeplotU2015, echo=FALSE}
+
+scree_plot_2015_usage
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Usage 2015
+
+```{r 1contrib_U2015, echo=FALSE}
+
+
+
+slide1_plotU2015 <- plot_grid(contrib_2015_usage_D1, contrib_2015_usage_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotU2015
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Usage 2015
+
+```{r 2contrib_U2015, echo=FALSE}
+slide2_plotU2015 <- plot_grid(contrib_2015_usage_D3, contrib_2015_usage_D4, ncol = 2, labels = "AUTO")
+slide2_plotU2015
+```
+
+
+##
+
+### Index distribution Usage 2015
+
+```{r hist_U2015, echo=FALSE}
+
+hist_2015_usage
+
+
+```
+
+
+##
+
+\centering
+### Composite Indices for 2016
+
+
+```{r Subsetting2016, echo=FALSE}
+
+patt <- "^A|^S|^U|^size_rev"
+var2encode <- c("size_rev")
+year <- 2016
+
+
+subsets_2016 <- subsetting_digidivide(data =  ict_combined1, 
+                                      patt =  patt, 
+                                      var2encode =  var2encode, 
+                                      year =  year, 
+                                      include_weights = T)
+
+```
+
+## Access 2016 Composite Index 
+
+### Eigenvalues Access 2016
+
+```{r Access2016, echo=FALSE}
+
+A_data_2016 <- subsets_2016$A_data
+
+
+results_access_2016w <- comp_index_dd_mixed(data =  A_data_2016, 
+                                            index = "access", 
+                                            year = 2016,
+                                            weights = A_data_2016$weight)
+
+
+eigen_A2016 <- round(eigenvalues_2016_access,4)
+
+
+kable(eigen_A2016, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,9)
+
+
+```
+
+## 
+
+### Screeplot Access 2016
+
+```{r screeplotA2016, echo=FALSE}
+
+scree_plot_2016_access
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Access 2016
+
+```{r 1contrib_A2016, echo=FALSE}
+
+
+
+slide1_plotA2016 <- plot_grid(contrib_2016_access_D1, contrib_2016_access_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotA2016
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Access 2016
+
+```{r 2contrib_A2016, echo=FALSE}
+slide2_plotA2016 <- plot_grid(contrib_2016_access_D3, contrib_2016_access_D4, ncol = 2, labels = "AUTO")
+
+slide2_plotA2016
+
+```
+
+
+##
+
+### Index distribution Access 2016
+
+```{r hist_A2016, echo=FALSE}
+
+hist_2016_access
+
+
+```
+
+
+## Skills 2016 Composite Index 
+
+### Eigenvalues Skills 2016
+
+```{r Skills2016, echo=FALSE}
+
+S_data_2016 <- subsets_2016$S_data
+
+
+results_skills_2016w <- comp_index_dd_mixed(data =  S_data_2016, 
+                                            index = "skills", 
+                                            year = 2016,
+                                            weights = S_data_2016$weight)
+
+
+eigen_S2016 <- round(eigenvalues_2016_skills,4)
+
+
+kable(eigen_S2016, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,12)
+
+
+```
+
+## 
+
+### Screeplot Skills 2016
+
+```{r screeplotS2016, echo=FALSE}
+
+scree_plot_2016_skills
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Skills 2016
+
+```{r 1contrib_S2016, echo=FALSE}
+
+
+
+slide1_plotS2016 <- plot_grid(contrib_2016_skills_D1, contrib_2016_skills_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotS2016
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Skills 2016
+
+```{r 2contrib_S2016, echo=FALSE}
+slide2_plotS2016 <- plot_grid(contrib_2016_skills_D3, contrib_2016_skills_D4, ncol = 2, labels = "AUTO")
+slide2_plotS2016
+```
+
+
+##
+
+### Index distribution Skills 2016
+
+```{r hist_S2016, echo=FALSE}
+
+hist_2016_skills
+
+
+```
+
+
+## Usage 2016 Composite Index 
+
+
+### Eigenvalues Usage 2016
+
+```{r Usage2016, echo=FALSE}
+
+U_data_2016 <- subsets_2016$U_data
+
+
+results_usage_2016w <- comp_index_dd_mixed(data =  U_data_2016, 
+                                           index = "usage", 
+                                           year = 2016,
+                                           weights = U_data_2016$weight)
+
+
+eigen_U2016 <- round(eigenvalues_2016_usage,4)
+
+
+kable(eigen_U2016, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,14)
+
+
+```
+
+## 
+
+### Screeplot Usage 2016
+
+```{r screeplotU2016, echo=FALSE}
+
+scree_plot_2016_usage
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Usage 2016
+
+```{r 1contrib_U2016, echo=FALSE}
+
+
+
+slide1_plotU2016 <- plot_grid(contrib_2016_usage_D1, contrib_2016_usage_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotU2016
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Usage 2016
+
+```{r 2contrib_U2016, echo=FALSE}
+slide2_plotU2016 <- plot_grid(contrib_2016_usage_D3, contrib_2016_usage_D4, ncol = 2, labels = "AUTO")
+slide2_plotU2016
+```
+
+
+##
+
+### Index distribution Usage 2016
+
+```{r hist_U2016, echo=FALSE}
+
+hist_2016_usage
+
+
+```
+
+
+##
+
+\centering
+### Composite Indices for 2017
+
+
+```{r Subsetting2017, echo=FALSE}
+
+patt <- "^A|^S|^U|^size_rev"
+var2encode <- c("size_rev")
+year <- 2017
+
+
+subsets_2017 <- subsetting_digidivide(data =  ict_combined1, 
+                                      patt =  patt, 
+                                      var2encode =  var2encode, 
+                                      year =  year, 
+                                      include_weights = T)
+
+```
+
+## Access 2017 Composite Index 
+
+### Eigenvalues Access 2017
+
+```{r Access2017, echo=FALSE}
+
+A_data_2017 <- subsets_2017$A_data
+
+
+results_access_2017w <- comp_index_dd_mixed(data =  A_data_2017, 
+                                            index = "access", 
+                                            year = 2017,
+                                            weights = A_data_2017$weight)
+
+
+eigen_A2017 <- round(eigenvalues_2017_access,4)
+
+
+kable(eigen_A2017, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,9)
+
+
+```
+
+## 
+
+### Screeplot Access 2017
+
+```{r screeplotA2017, echo=FALSE}
+
+scree_plot_2017_access
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Access 2017
+
+```{r 1contrib_A2017, echo=FALSE}
+
+
+
+slide1_plotA2017 <- plot_grid(contrib_2017_access_D1, contrib_2017_access_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotA2017
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Access 2017
+
+```{r 2contrib_A2017, echo=FALSE}
+slide2_plotA2017 <- plot_grid(contrib_2017_access_D3, contrib_2017_access_D4, ncol = 2, labels = "AUTO")
+
+slide2_plotA2017
+
+```
+
+
+##
+
+### Index distribution Access 2017
+
+```{r hist_A2017, echo=FALSE}
+
+hist_2017_access
+
+
+```
+
+
+## Skills 2017 Composite Index 
+
+### Eigenvalues Skills 2017
+
+```{r Skills2017, echo=FALSE}
+
+S_data_2017 <- subsets_2017$S_data
+
+
+results_skills_2017w <- comp_index_dd_mixed(data =  S_data_2017, 
+                                            index = "skills", 
+                                            year = 2017,
+                                            weights = S_data_2017$weight)
+
+
+eigen_S2017 <- round(eigenvalues_2017_skills,4)
+
+
+kable(eigen_S2017, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,12)
+
+
+```
+
+## 
+
+### Screeplot Skills 2017
+
+```{r screeplotS2017, echo=FALSE}
+
+scree_plot_2017_skills
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Skills 2017
+
+```{r 1contrib_S2017, echo=FALSE}
+
+
+
+slide1_plotS2017 <- plot_grid(contrib_2017_skills_D1, contrib_2017_skills_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotS2017
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Skills 2017
+
+```{r 2contrib_S2017, echo=FALSE}
+slide2_plotS2017 <- plot_grid(contrib_2017_skills_D3, contrib_2017_skills_D4, ncol = 2, labels = "AUTO")
+slide2_plotS2017
+```
+
+
+##
+
+### Index distribution Skills 2017
+
+```{r hist_S2017, echo=FALSE}
+
+hist_2017_skills
+
+
+```
+
+
+## Usage 2017 Composite Index 
+
+
+### Eigenvalues Usage 2017
+
+```{r Usage2017, echo=FALSE}
+
+U_data_2017 <- subsets_2017$U_data
+
+
+results_usage_2017w <- comp_index_dd_mixed(data =  U_data_2017, 
+                                           index = "usage", 
+                                           year = 2017,
+                                           weights = U_data_2017$weight)
+
+
+eigen_U2017 <- round(eigenvalues_2017_usage,4)
+
+
+kable(eigen_U2017, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,14)
+
+
+```
+
+## 
+
+### Screeplot Usage 2017
+
+```{r screeplotU2017, echo=FALSE}
+
+scree_plot_2017_usage
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Usage 2017
+
+```{r 1contrib_U2017, echo=FALSE}
+
+
+
+slide1_plotU2017 <- plot_grid(contrib_2017_usage_D1, contrib_2017_usage_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotU2017
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Usage 2017
+
+```{r 2contrib_U2017, echo=FALSE}
+slide2_plotU2017 <- plot_grid(contrib_2017_usage_D3, contrib_2017_usage_D4, ncol = 2, labels = "AUTO")
+slide2_plotU2017
+```
+
+
+##
+
+### Index distribution Usage 2017
+
+```{r hist_U2017, echo=FALSE}
+
+hist_2017_usage
+
+
+```
+
+
+##
+
+\centering
+### Composite Indices for 2018
+
+
+```{r Subsetting2018, echo=FALSE}
+
+patt <- "^A|^S|^U|^size_rev"
+var2encode <- c("size_rev")
+year <- 2018
+
+
+subsets_2018 <- subsetting_digidivide(data =  ict_combined1, 
+                                      patt =  patt, 
+                                      var2encode =  var2encode, 
+                                      year =  year, 
+                                      include_weights = T)
+
+```
+
+## Access 2018 Composite Index 
+
+### Eigenvalues Access 2018
+
+```{r Access2018, echo=FALSE}
+
+A_data_2018 <- subsets_2018$A_data
+
+
+results_access_2018w <- comp_index_dd_mixed(data =  A_data_2018, 
+                                            index = "access", 
+                                            year = 2018,
+                                            weights = A_data_2018$weight)
+
+
+eigen_A2018 <- round(eigenvalues_2018_access,4)
+
+
+kable(eigen_A2018, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,9)
+
+
+```
+
+## 
+
+### Screeplot Access 2018
+
+```{r screeplotA2018, echo=FALSE}
+
+scree_plot_2018_access
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Access 2018
+
+```{r 1contrib_A2018, echo=FALSE}
+
+
+
+slide1_plotA2018 <- plot_grid(contrib_2018_access_D1, contrib_2018_access_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotA2018
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Access 2018
+
+```{r 2contrib_A2018, echo=FALSE}
+slide2_plotA2018 <- plot_grid(contrib_2018_access_D3, contrib_2018_access_D4, ncol = 2, labels = "AUTO")
+
+slide2_plotA2018
+
+```
+
+
+##
+
+### Index distribution Access 2018
+
+```{r hist_A2018, echo=FALSE}
+
+hist_2018_access
+
+
+```
+
+
+## Skills 2018 Composite Index 
+
+### Eigenvalues Skills 2018
+
+```{r Skills2018, echo=FALSE}
+
+S_data_2018 <- subsets_2018$S_data
+
+
+results_skills_2018w <- comp_index_dd_mixed(data =  S_data_2018, 
+                                            index = "skills", 
+                                            year = 2018,
+                                            weights = S_data_2018$weight)
+
+
+eigen_S2018 <- round(eigenvalues_2018_skills,4)
+
+
+kable(eigen_S2018, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,12)
+
+
+```
+
+## 
+
+### Screeplot Skills 2018
+
+```{r screeplotS2018, echo=FALSE}
+
+scree_plot_2018_skills
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Skills 2018
+
+```{r 1contrib_S2018, echo=FALSE}
+
+
+
+slide1_plotS2018 <- plot_grid(contrib_2018_skills_D1, contrib_2018_skills_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotS2018
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Skills 2018
+
+```{r 2contrib_S2018, echo=FALSE}
+slide2_plotS2018 <- plot_grid(contrib_2018_skills_D3, contrib_2018_skills_D4, ncol = 2, labels = "AUTO")
+slide2_plotS2018
+```
+
+
+##
+
+### Index distribution Skills 2018
+
+```{r hist_S2018, echo=FALSE}
+
+hist_2018_skills
+
+
+```
+
+
+## Usage 2018 Composite Index 
+
+
+### Eigenvalues Usage 2018
+
+```{r Usage2018, echo=FALSE}
+
+U_data_2018 <- subsets_2018$U_data
+
+
+results_usage_2018w <- comp_index_dd_mixed(data =  U_data_2018, 
+                                           index = "usage", 
+                                           year = 2018,
+                                           weights = U_data_2018$weight)
+
+
+eigen_U2018 <- round(eigenvalues_2018_usage,4)
+
+
+kable(eigen_U2018, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,14)
+
+
+```
+
+## 
+
+### Screeplot Usage 2018
+
+```{r screeplotU2018, echo=FALSE}
+
+scree_plot_2018_usage
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Usage 2018
+
+```{r 1contrib_U2018, echo=FALSE}
+
+
+
+slide1_plotU2018 <- plot_grid(contrib_2018_usage_D1, contrib_2018_usage_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotU2018
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Usage 2018
+
+```{r 2contrib_U2018, echo=FALSE}
+slide2_plotU2018 <- plot_grid(contrib_2018_usage_D3, contrib_2018_usage_D4, ncol = 2, labels = "AUTO")
+slide2_plotU2018
+```
+
+
+##
+
+### Index distribution Usage 2018
+
+```{r hist_U2018, echo=FALSE}
+
+hist_2018_usage
+
+
+```
+
+
+##
+
+\centering
+### Composite Indices for 2019
+
+
+```{r Subsetting2019, echo=FALSE}
+
+patt <- "^A|^S|^U|^size_rev"
+var2encode <- c("size_rev")
+year <- 2019
+
+
+subsets_2019 <- subsetting_digidivide(data =  ict_combined1, 
+                                      patt =  patt, 
+                                      var2encode =  var2encode, 
+                                      year =  year, 
+                                      include_weights = T)
+
+```
+
+## Access 2019 Composite Index 
+
+### Eigenvalues Access 2019
+
+```{r Access2019, echo=FALSE}
+
+A_data_2019 <- subsets_2019$A_data
+
+
+results_access_2019w <- comp_index_dd_mixed(data =  A_data_2019, 
+                                            index = "access", 
+                                            year = 2019,
+                                            weights = A_data_2019$weight)
+
+
+eigen_A2019 <- round(eigenvalues_2019_access,4)
+
+
+kable(eigen_A2019, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,9)
+
+
+```
+
+## 
+
+### Screeplot Access 2019
+
+```{r screeplotA2019, echo=FALSE}
+
+scree_plot_2019_access
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Access 2019
+
+```{r 1contrib_A2019, echo=FALSE}
+
+
+
+slide1_plotA2019 <- plot_grid(contrib_2019_access_D1, contrib_2019_access_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotA2019
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Access 2019
+
+```{r 2contrib_A2019, echo=FALSE}
+slide2_plotA2019 <- plot_grid(contrib_2019_access_D3, contrib_2019_access_D4, ncol = 2, labels = "AUTO")
+
+slide2_plotA2019
+
+```
+
+
+##
+
+### Index distribution Access 2019
+
+```{r hist_A2019, echo=FALSE}
+
+hist_2019_access
+
+
+```
+
+
+## Skills 2019 Composite Index 
+
+### Eigenvalues Skills 2019
+
+```{r Skills2019, echo=FALSE}
+
+S_data_2019 <- subsets_2019$S_data
+
+
+results_skills_2019w <- comp_index_dd_mixed(data =  S_data_2019, 
+                                            index = "skills", 
+                                            year = 2019,
+                                            weights = S_data_2019$weight)
+
+
+eigen_S2019 <- round(eigenvalues_2019_skills,4)
+
+
+kable(eigen_S2019, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,12)
+
+
+```
+
+## 
+
+### Screeplot Skills 2019
+
+```{r screeplotS2019, echo=FALSE}
+
+scree_plot_2019_skills
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Skills 2019
+
+```{r 1contrib_S2019, echo=FALSE}
+
+
+
+slide1_plotS2019 <- plot_grid(contrib_2019_skills_D1, contrib_2019_skills_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotS2019
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Skills 2019
+
+```{r 2contrib_S2019, echo=FALSE}
+slide2_plotS2019 <- plot_grid(contrib_2019_skills_D3, contrib_2019_skills_D4, ncol = 2, labels = "AUTO")
+slide2_plotS2019
+```
+
+
+##
+
+### Index distribution Skills 2019
+
+```{r hist_S2019, echo=FALSE}
+
+hist_2019_skills
+
+
+```
+
+
+## Usage 2019 Composite Index 
+
+
+### Eigenvalues Usage 2019
+
+```{r Usage2019, echo=FALSE}
+
+U_data_2019 <- subsets_2019$U_data
+
+
+results_usage_2019w <- comp_index_dd_mixed(data =  U_data_2019, 
+                                           index = "usage", 
+                                           year = 2019,
+                                           weights = U_data_2019$weight)
+
+
+eigen_U2019 <- round(eigenvalues_2019_usage,4)
+
+
+kable(eigen_U2019, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,14)
+
+
+```
+
+## 
+
+### Screeplot Usage 2019
+
+```{r screeplotU2019, echo=FALSE}
+
+scree_plot_2019_usage
+
+```
+
+
+##
+
+### Contributions by Dimensions 1 and 2 Usage 2019
+
+```{r 1contrib_U2019, echo=FALSE}
+
+
+
+slide1_plotU2019 <- plot_grid(contrib_2019_usage_D1, contrib_2019_usage_D2, ncol = 2, labels = "AUTO")
+
+slide1_plotU2019
+
+
+
+```
+
+##
+
+### Contributions by Dimensions 3 and 4 Usage 2019
+
+```{r 2contrib_U2019, echo=FALSE}
+slide2_plotU2019 <- plot_grid(contrib_2019_usage_D3, contrib_2019_usage_D4, ncol = 2, labels = "AUTO")
+slide2_plotU2019
+```
+
+
+##
+
+### Index distribution Usage 2019
+
+```{r hist_U2019, echo=FALSE}
+
+hist_2019_usage
+
+
+```
+
+

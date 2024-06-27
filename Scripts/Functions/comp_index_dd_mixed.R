@@ -75,7 +75,7 @@ comp_index_dd_mixed <- function(data, index = "access", year = 2014, weights = N
   indic_col <- setdiff(1:ncol(data), which(names(data) == "weight"))
   
   # Perform FAMD
-  famd_results <- FAMD(data[, indic_col], graph = FALSE, ncp = 8, row.w = weights)
+  famd_results <- FAMD(data[, indic_col], graph = FALSE, ncp = ncol(data[, indic_col]), row.w = weights)
   famd_results_name <- paste0("famd_results_", year, "_", index)
   assign(famd_results_name, famd_results, envir = .GlobalEnv)
   
