@@ -30,13 +30,19 @@ library(stargazer)
 
 #### 0. Loading the environment and data ####
 
-load(here("Scripts", "Environments",  "size_rev_results_weighted.RData"))
+source(here("Scripts", "Functions", "create_summary_table.R"))
+source(here("Scripts", "Functions", "yearly_stats_and_plot.R"))
+# source(here("Scripts", "Functions", "ci_factor_mixed.R"))
 
 
-load(here("Data", "Processed", "CI_DD_comb_rev_weighted.rda"))
+
+# load(here("Scripts", "Environments",  "size_rev_results_weighted.RData"))
+
+
+# load(here("Data", "Processed", "CI_DD_comb_rev_weighted.rda"))
 load(here("Data", "Processed", "CI_DD_comb_rev_weightedS11.rda")) ### Presented in Urbino
 
-load(here("Scripts", "Environments",  "WeightingSchemes.RData"))
+# load(here("Scripts", "Environments",  "WeightingSchemes.RData"))
 
 
 ci_dd_combined_rev <- ci_dd_combined_weighted
