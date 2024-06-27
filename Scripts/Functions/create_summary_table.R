@@ -29,7 +29,7 @@ create_summary_table <- function(data) {
   
   return(summary_table)
 }
-load(here("Data", "Processed", "CI_DD_comb_rev.rda"))
-
-# Example usage
-summary_table <- create_summary_table(ci_dd_combined)
+# load(here("Data", "Processed", "CI_DD_comb_rev.rda"))
+# 
+# # Example usage
+# summary_table <- create_summary_table(ci_dd_combined)

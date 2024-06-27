@@ -1,0 +1,281 @@
+---
+title: "Weighted Results - Scheme 11"
+author: "Luis Carlos Castillo"
+date: "`r Sys.Date()`"
+header-includes:
+- \usepackage{booktabs}
+- \usepackage{longtable}
+output:
+  beamer_presentation: default
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE}
+#### 0. Load the necessary packages #####
+library(readr)
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(here)
+library(git2r)
+library(visdat)
+library(naniar)
+library(chatgpt)
+library(gptstudio)
+require(devtools)
+library(mice)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(knitr)
+library(rmarkdown)
+library(ggside)
+library(ggstatsplot)
+library(ggparallel)
+
+knitr::opts_chunk$set(echo = FALSE, warning = F, message = F )
+kableExtra.auto_format = FALSE
+knitr.table.format = "latex"
+knitr::opts_knit$set(kable.force.latex = TRUE)
+
+source(here("Scripts", "Functions", "create_summary_table.R"))
+source(here("Scripts", "Functions", "yearly_stats_and_plot.R"))
+
+## Scheme 11: year,  region, Revenue_K,  sec_name, size_rev
+
+```
+
+```{r long_code, include=FALSE}
+
+load(here("Data", "Processed", "CI_DD_comb_rev_weightedS11.rda")) ### Presented in Urbino
+
+ci_dd_combined_rev <- ci_dd_combined_weighted
+
+#### 0.1. Adding the quadrant varaible ####
+# Add a new column for quadrants
+combined_data_harmonized <- ci_dd_combined_rev %>%
+  mutate(
+    quadrant = case_when(
+      access_n > 0.5 & secDD_n > 0.5 ~ "Q1 (H_A, H_S&U) )",
+      access_n <= 0.5 & secDD_n > 0.5 ~ "Q2 (L_A, H_S&U)",
+      access_n <= 0.5 & secDD_n <= 0.5 ~ "Q3 (L_A, L_S&U)",
+      access_n > 0.5 & secDD_n <= 0.5 ~ "Q4 (H_A, L_S&U)"
+    )
+  )
+
+
+combined_data_harmonized$year <- as.numeric(as.character(combined_data_harmonized$year))
+# combined_data_harmonized$mac_sec <- as.factor(combined_data_harmonized$mac_sec)
+combined_data_harmonized$quadrant <- as.factor(combined_data_harmonized$quadrant)
+
+
+### 2. Individual representation of the histograms ####
+
+# Histogram for access_n
+p1_access <- ggplot(combined_data_harmonized, aes(x = access_n)) +
+  geom_histogram() +
+  ggtitle("Histogram of Access") +
+  xlab("Access") +
+  ylab("Frequency") +
+  facet_wrap(~ year, scales = "fixed")
+
+p1_access
+
+# Histogram for skills_n
+p2_skills <- ggplot(combined_data_harmonized, aes(x = skills_n)) +
+  geom_histogram() +
+  ggtitle("Histogram of Skills") +
+  xlab("Skills") +
+  ylab("Frequency") +
+  facet_wrap(~ year, scales = "fixed")
+p2_skills
+
+# Histogram for usage_n
+p2_usage <- ggplot(combined_data_harmonized, aes(x = usage_n)) +
+  geom_histogram() +
+  ggtitle("Histogram of Usage") +
+  xlab("Usage") +
+  ylab("Frequency") +
+  facet_wrap(~ year, scales = "fixed")
+p2_usage
+
+
+#### 3. LINE PLOTS ####
+
+#### 3.1. Yearly trend of Access, Skills and Usage ####
+
+line_plot_by_year <- yearly_stats_and_plot(combined_data_harmonized, 
+                                           line_vars = c("access_n", "skills_n", "usage_n"), 
+                                           statistic = "median")
+
+
+
+
+
+#### 3.1. SIZE_Rev Yearly lineplots by size by revenue ####
+
+# Generate a line plot with access_n and skills_n
+line_plot_by_size <- yearly_stats_and_plot(combined_data_harmonized, 
+                                           line_vars = c("access_n", "skills_n", "usage_n"), 
+                                           group_var = "size_rev", 
+                                           statistic = "median")
+
+
+
+#### 3.2. SMEs_Rev Yearly lineplots by size by revenue ####
+
+# Generate a line plot with access_n and skills_n
+line_plot_by_smeR <- yearly_stats_and_plot(combined_data_harmonized, 
+                                           line_vars = c("access_n", "skills_n", "usage_n"), 
+                                           group_var = "sme_rev", 
+                                           statistic = "median",
+                                           size = "big",
+                                           angle = F)
+
+
+
+
+#### 3.3. MAC_SEC Yearly lineplots by size by revenue ####
+
+# Generate a line plot with access_n and skills_n
+line_plot_by_mac <- yearly_stats_and_plot(combined_data_harmonized, 
+                                          line_vars = c("access_n", "skills_n", "usage_n"), 
+                                          group_var = "mac_sec", 
+                                          statistic = "median")
+
+
+
+#### 3.4. MAC_SEC Yearly lineplots by size by revenue ####
+
+# Generate a line plot with access_n and skills_n
+line_plot_by_ateco <- yearly_stats_and_plot(combined_data_harmonized, 
+                                            line_vars = c("access_n", "skills_n", "usage_n"), 
+                                            group_var = "sec_name", 
+                                            statistic = "median")
+
+
+
+
+#### 3.5. REGION Yearly lineplots by size by revenue ####
+
+# Generate a line plot with access_n and skills_n
+line_plot_by_region <- yearly_stats_and_plot(combined_data_harmonized, 
+                                             line_vars = c("access_n", "skills_n", "usage_n"), 
+                                             group_var = "region", 
+                                             statistic = "median")
+
+```
+
+
+
+
+## Access
+
+```{r hist_A, echo=FALSE}
+
+p1_access
+
+```
+
+## Skills
+
+```{r hist_S, echo=FALSE}
+
+p2_skills
+
+```
+
+## Usage
+
+```{r hist_U, echo=FALSE}
+
+p2_usage
+
+```
+
+<!-- ## Summary Stats -->
+
+<!-- ```{r access_stats, echo=FALSE} -->
+<!-- #### 1. Summary Stats for Both Indices #### -->
+<!-- # Calculate summary statistics for access_n and secDD_n by year and size  -->
+<!-- load(here("Data", "Processed", "CI_DD_comb_rev.rda")) -->
+<!-- summary_stats <- ci_dd_combined %>% -->
+<!--   group_by(year) %>%  # Ensure grouping by both year and size if needed -->
+<!--   summarise( -->
+<!--     across(c(access_n),  -->
+<!--            list(mean = ~round(mean(.), 3), -->
+<!--                 sd = ~round(sd(.), 3), -->
+<!--                 q1 = ~round(quantile(., 0.25), 3), -->
+<!--                 median = ~round(median(.), 3), -->
+<!--                 q3 = ~round(quantile(., 0.75), 3)),  -->
+<!--            .names = "{.col}_{.fn}")) %>% -->
+<!--   ungroup() -->
+
+<!-- kable(summary_stats, booktabs = T) %>% -->
+<!--   kable_styling(font_size = 6, latex_options = c("repeat_header"))  -->
+
+
+<!-- ``` -->
+
+
+
+## Trends by Year 
+
+```{r linePlot1, echo=FALSE}
+
+line_plot_by_year
+
+```
+
+
+## Trends by Size 
+
+```{r linePlot2, echo=FALSE}
+
+line_plot_by_size
+
+```
+
+
+## Trends by SMEs vs Large 
+
+```{r linePlot3, echo=FALSE}
+
+line_plot_by_smeR
+
+```
+
+
+## Trends by Macro Sectors 
+
+```{r linePlot4, echo=FALSE}
+
+line_plot_by_mac
+
+```
+
+## Trends by Ateco
+
+```{r linePlot5, echo=FALSE}
+
+line_plot_by_ateco
+
+```
+
+## Trends by Regions
+
+```{r linePlot6, echo=FALSE}
+
+line_plot_by_region
+
+```
+
+
+
+
+
+
+
+
+
+
