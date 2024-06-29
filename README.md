@@ -1,0 +1,1 @@
+Exploring Patterns and Shifts: Factor Analysis of the First and Second-Level Digital Divide in Italian Enterprises![image](https://github.com/luchocastillo84/Factor_Analysis_Digital_Divide/assets/65243923/47536ee5-7a86-4b69-96c4-cc73248d28dd)
