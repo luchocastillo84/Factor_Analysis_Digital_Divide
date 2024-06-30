@@ -1,0 +1,271 @@
+---
+title: 'Tracking the Digital Divide: Factor Analysis and Time Trends in Italian Firms'
+author: "Luis Carlos Castillo"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output:
+  beamer_presentation:
+    keep_tex: yes
+    citation_package: natbib
+    includes:
+      in_header: mystyle3.tex
+institute: |
+  | Binational Doctorate
+  | University of Urbino and Universty of Bremen
+  | Ph.D. Program in Global Studies
+  | Supervisor: Prof. Francesco Vidoli
+  | Co-Supervisor: Prof. Dr. Christian Cordes
+editor_options:
+  markdown:
+    wrap: 72
+link-citations: yes
+linkcolor: myblue
+natbiboptions: round
+header-includes:
+ - \usepackage{etoolbox}
+ - \AtBeginEnvironment{thebibliography}{\scriptsize}
+bibliography: ShiftPatterns.bib
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, warning = F, message = F )
+kableExtra.auto_format = FALSE
+knitr.table.format = "latex"
+knitr::opts_knit$set(kable.force.latex = TRUE)
+
+
+
+```
+
+```{r, include=FALSE}
+options(tinytex.verbose = TRUE)
+```
+
+```{r Loading packages, include=FALSE}
+library(tidyverse)
+library(devtools)
+library(here)
+library(bibliometrix)
+library(stringr)
+library(readr)
+library(visdat)
+library(stringr)
+library(dplyr)
+library(readxl)
+library(janitor)
+library(ggplot2)
+library(gridExtra)
+options(kableExtra.latex.load_packages = FALSE)
+library(kableExtra)
+library(rmarkdown)
+library(tidytext)
+library(knitr)
+library(qwraps2)
+library(dplyr)
+library(tables)
+library(bibtex)
+library(igraph)
+library(RColorBrewer)
+library(Matrix)
+library(flextable)
+library(ggpubr)
+library(cowplot)
+library(ggeasy)
+library(Hmisc)
+library(gridGraphics)
+library(gridBase)
+library(tinytex)
+library(stargazer)
+
+source(here("Scripts", "Functions", "create_summary_table.R"))
+source(here("Scripts", "Functions", "yearly_stats_and_plot.R"))
+
+## Scheme 11: year,  region, Revenue_K,  sec_name, size_rev
+
+```
+
+# Cumulative Dissertation
+
+```{=tex}
+\begin{center}
+\includegraphics[width=1\textwidth, height=0.75\textheight]{structure_thesis.png}
+\end{center}
+```
+
+
+
+# 1. Introduction
+
+-   DT play a pivotal role in reshaping business models [@trischler2023]
+    , driving innovation [@ciarli2021], and fostering competitive
+    advantages [@jeganjosephjerome2024].
+
+-   The unequal adoption of DT has led to significant challenge: the
+    digital divide.
+
+-   The digital divide at the firm level is a multifaceted gap
+    characterized not only by disparities in access, skills and usage of
+    DT, but also the derived benefits from different types of use.
+
+-   While the digital divide is a global issue, its impact on
+    enterprises, especially in Italy, presents unique challenges and
+    opportunities.
+
+
+# 2. Objectives
+
+-   Develop composite indices to track trends in the first and
+    second-level digital divide.
+
+-   Analyze variations in the first and second-level digital divide
+    across firm sizes, sectors, and regions in Italy.
+
+-   Evaluate the alignment of resources and technology integration
+    theory with observed data.
+
+-   Propose targeted policy interventions based on research findings.
+
+# 3.1. Research Questions
+
+-   How does the Resources and Technology Integration theory reflect
+    observed patterns in DT adoption across different Italian enterprises?
+
+-   What are the evolving patterns and shifts in access, skills, and usage
+    among Italian enterprises, and how do these dynamics reflect the
+    disparities between the three indices across different firm sizes,
+    sectors, and regions over a six-year period?
+
+-   According to the findings, what policy interventions can be
+    recommended to help Italian enterprises more effectively bridge the
+    digital divide?
+
+
+# 5. Data
+
+```{r avgYear, echo=FALSE}
+
+load(here("Data", "Processed", "CI_clean.rda"))
+
+# Calculate the number of observations per year
+options(scipen=999)
+observations_per_year <- CI_clean %>%
+  group_by(year) %>%
+  summarise(count = n())
+
+avgPerYear <- round(mean(observations_per_year$count),2)
+
+```
+
+-   The dataset was derived from the ICT Usage in Enterprises Survey
+    conducted annually between 2014 and 2019 by ISTAT.
+    
+-   In total, 29 variables were used to extract three factors that represent the theoretical constructs.
+
+    - Access index: 6 variables
+    - Skills index: 9 variables
+    - Usage index: 11 variables
+    - **Control variable:** Firm size with three categories (small, medium, large)
+
+-   Considerations and Limitations.
+
+    -   Independence of Annual Data
+    
+-    Data treatments, codes, and summary statistics,  are available on my [GitHub repository](https://github.com/luchocastillo84/Factor_Analysis_Digital_Divide/tree/main) for replicability and further analysis.
+
+
+# 6 Methodology
+
+-   The indices were constructed using dimensionality reduction
+    techniques Factor Analysis for Mixed Data (FAMD) and Multiple
+    Correspondence Analysis (MCA).
+-   Visualise and measure adoption patterns.
+
+
+$$ \text{Access Index}_i = a_1 \cdot X1_i + a_2 \cdot X2_i + \ldots + a_6 \cdot X6_i + d \cdot \text{Size}_i $$
+$$ \text{Skills Index}_i = b_1 \cdot Y1_i + b_2 \cdot Y2_i + \ldots + b_6 \cdot Y6_i + e \cdot \text{Size}_i $$
+$$ \text{Usage Index}_i = c_1 \cdot Z1_i + c_2 \cdot Z2_i + \ldots + c_{11} \cdot Z11_i + f \cdot \text{Size}_i $$
+
+Where $\mathbf{X}$, $\mathbf{Y}$, and $\mathbf{Z}$ are the matrices of observations, $\mathbf{a}$, $\mathbf{b}$, and $\mathbf{c}$ are the vectors of weights derived from FAMD and MCA contributions of each variable to the retained dimensions, and $\text{Size}_i$ represents the firm size control variable with its respective weights $d$, $e$, and $f$.
+
+
+# 7. Results I
+
+```{r yearTrendSize, echo=FALSE}
+#### 3.1. SIZE_Rev Yearly lineplots by size by revenue ####
+
+load(here("Data", "Processed", "CI_DD_comb_rev_weightedS11.rda")) ### Presented in Urbino
+
+ci_dd_combined_rev <- ci_dd_combined_weighted
+
+#### 0.1. Adding the quadrant varaible ####
+# Add a new column for quadrants
+combined_data_harmonized <- ci_dd_combined_rev %>%
+  mutate(
+    quadrant = case_when(
+      access_n > 0.5 & secDD_n > 0.5 ~ "Q1 (H_A, H_S&U) )",
+      access_n <= 0.5 & secDD_n > 0.5 ~ "Q2 (L_A, H_S&U)",
+      access_n <= 0.5 & secDD_n <= 0.5 ~ "Q3 (L_A, L_S&U)",
+      access_n > 0.5 & secDD_n <= 0.5 ~ "Q4 (H_A, L_S&U)"
+    )
+  )
+
+
+combined_data_harmonized$year <- as.numeric(as.character(combined_data_harmonized$year))
+# combined_data_harmonized$mac_sec <- as.factor(combined_data_harmonized$mac_sec)
+combined_data_harmonized$quadrant <- as.factor(combined_data_harmonized$quadrant)
+
+
+
+
+# Generate a line plot with access_n and skills_n
+line_plot_by_size <- yearly_stats_and_plot(combined_data_harmonized, 
+                                           line_vars = c("access_n", "skills_n", "usage_n"), 
+                                           group_var = "size_rev", 
+                                           statistic = "median")
+
+line_plot_by_size
+
+```
+
+
+# 7.1. Results II
+
+```{r yearTrendMac, echo=FALSE}
+#### 3.3. MAC_SEC Yearly lineplots by size by revenue ####
+
+# Generate a line plot with access_n and skills_n
+line_plot_by_mac <- yearly_stats_and_plot(combined_data_harmonized, 
+                                          line_vars = c("access_n", "skills_n", "usage_n"), 
+                                          group_var = "mac_sec", 
+                                          statistic = "median")
+
+line_plot_by_mac
+```
+
+
+
+# 7.2. Results III
+
+```{r yearTrendReg, echo=FALSE}
+
+#### 3.5. REGION Yearly lineplots by size by revenue ####
+
+# Generate a line plot with access_n and skills_n
+line_plot_by_region <- yearly_stats_and_plot(combined_data_harmonized, 
+                                             line_vars = c("access_n", "skills_n", "usage_n"), 
+                                             group_var = "region", 
+                                             statistic = "median")
+
+line_plot_by_region
+```
+
+
+
+# 8. Q&A
+
+Thank you for your attention
+
+# References {.allowframebreaks}
+
+::: {#refs}
+:::
