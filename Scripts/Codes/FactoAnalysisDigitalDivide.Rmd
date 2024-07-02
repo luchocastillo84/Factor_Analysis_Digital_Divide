@@ -88,7 +88,7 @@ source(here("Scripts", "Functions", "yearly_stats_and_plot.R"))
 
 ```{=tex}
 \begin{center}
-\includegraphics[width=1\textwidth, height=0.75\textheight]{structure_thesis.png}
+\includegraphics[width=1.1\textwidth, height=1.2\textheight]{structure_thesis1.png}
 \end{center}
 ```
 
@@ -114,33 +114,18 @@ source(here("Scripts", "Functions", "yearly_stats_and_plot.R"))
 
 # 2. Objectives
 
+- Explore changes over time in the digital divide, focusing on differences across firm sizes, sectors, and regions.
+
 -   Develop composite indices to track trends in the first and
     second-level digital divide.
-
--   Analyze variations in the first and second-level digital divide
-    across firm sizes, sectors, and regions in Italy.
 
 -   Evaluate the alignment of resources and technology integration
     theory with observed data.
 
 -   Propose targeted policy interventions based on research findings.
 
-# 3.1. Research Questions
 
--   How does the Resources and Technology Integration theory reflect
-    observed patterns in DT adoption across different Italian enterprises?
-
--   What are the evolving patterns and shifts in access, skills, and usage
-    among Italian enterprises, and how do these dynamics reflect the
-    disparities between the three indices across different firm sizes,
-    sectors, and regions over a six-year period?
-
--   According to the findings, what policy interventions can be
-    recommended to help Italian enterprises more effectively bridge the
-    digital divide?
-
-
-# 5. Data
+# 3. Data
 
 ```{r avgYear, echo=FALSE}
 
@@ -173,22 +158,27 @@ avgPerYear <- round(mean(observations_per_year$count),2)
 -    Data treatments, codes, and summary statistics,  are available on my [GitHub repository](https://github.com/luchocastillo84/Factor_Analysis_Digital_Divide/tree/main) for replicability and further analysis.
 
 
-# 6 Methodology
+# 4. Methodology
 
 -   The indices were constructed using dimensionality reduction
     techniques Factor Analysis for Mixed Data (FAMD) and Multiple
     Correspondence Analysis (MCA).
--   Visualise and measure adoption patterns.
+
+$$ \text{Access Index}_i = \sum_{j=1}^{6} a_j \cdot X_{j,i} \cdot w_i $$
+$$ \text{Skills Index}_i = \sum_{k=1}^{9} b_k \cdot Y_{k,i} \cdot w_i $$
+$$ \text{Usage Index}_i = \sum_{m=1}^{11} c_m \cdot Z_{m,i} \cdot w_i $$
+
+Where $\mathbf{X}$, $\mathbf{Y}$, and $\mathbf{Z}$ are the matrices of observations, $\mathbf{a}$, $\mathbf{b}$, and $\mathbf{c}$ are the vectors of weights derived from FAMD and MCA contributions of each variable to the retained dimensions, and $\mathbf{w}$ is the vector of weights accounting for the share of groups and years.
 
 
-$$ \text{Access Index}_i = a_1 \cdot X1_i + a_2 \cdot X2_i + \ldots + a_6 \cdot X6_i + d \cdot \text{Size}_i $$
-$$ \text{Skills Index}_i = b_1 \cdot Y1_i + b_2 \cdot Y2_i + \ldots + b_6 \cdot Y6_i + e \cdot \text{Size}_i $$
-$$ \text{Usage Index}_i = c_1 \cdot Z1_i + c_2 \cdot Z2_i + \ldots + c_{11} \cdot Z11_i + f \cdot \text{Size}_i $$
 
-Where $\mathbf{X}$, $\mathbf{Y}$, and $\mathbf{Z}$ are the matrices of observations, $\mathbf{a}$, $\mathbf{b}$, and $\mathbf{c}$ are the vectors of weights derived from FAMD and MCA contributions of each variable to the retained dimensions, and $\text{Size}_i$ represents the firm size control variable with its respective weights $d$, $e$, and $f$.
+$$ \text{Access Index}_i = \sum_{j=1}^{6} a_j \cdot X_{j,i} $$
+$$ \text{Skills Index}_i = \sum_{k=1}^{9} b_k \cdot Y_{k,i} $$
+$$ \text{Usage Index}_i = \sum_{m=1}^{11} c_m \cdot Z_{m,i} $$
 
 
-# 7. Results I
+
+# 5. Results I
 
 ```{r yearTrendSize, echo=FALSE}
 #### 3.1. SIZE_Rev Yearly lineplots by size by revenue ####
@@ -217,18 +207,32 @@ combined_data_harmonized$quadrant <- as.factor(combined_data_harmonized$quadrant
 
 
 
-# Generate a line plot with access_n and skills_n
-line_plot_by_size <- yearly_stats_and_plot(combined_data_harmonized, 
-                                           line_vars = c("access_n", "skills_n", "usage_n"), 
-                                           group_var = "size_rev", 
-                                           statistic = "median")
+#### 3.2. SMEs_Rev Yearly lineplots by size by revenue ####
 
-line_plot_by_size
+# Generate a line plot with access_n and skills_n
+line_plot_by_smeR <- yearly_stats_and_plot(combined_data_harmonized, 
+                                           line_vars = c("access_n", "skills_n", "usage_n"), 
+                                           group_var = "sme_rev", 
+                                           statistic = "median",
+                                           size = "big",
+                                           angle = F)
+line_plot_by_smeR
 
 ```
 
+#  Key takeaways I
 
-# 7.1. Results II
+
+- While SMEs can maintain continuous growth in access, larger firms face different challenges.
+
+- These findings align with Bratta et al. (2020), who discuss the hyper-depreciation measure issued in 2016.
+
+- SMEs face more challenges in acquiring digital skills. There is a significant shortage of ICT graduates in Italy according to the “Digital Skills Observatory” in 2019.
+
+- A higher usage index is present in SMEs as existing technologies need to be operated either by outsourcing digital skills or maximising the existing workforce.
+
+
+# 5.1. Results II
 
 ```{r yearTrendMac, echo=FALSE}
 #### 3.3. MAC_SEC Yearly lineplots by size by revenue ####
@@ -242,26 +246,61 @@ line_plot_by_mac <- yearly_stats_and_plot(combined_data_harmonized,
 line_plot_by_mac
 ```
 
+# Key takeaways II
+
+- Notable progress in digital access across sectors due to effective policy measures like hyper-depreciation.
+
+- The digital skills index remains low, highlighting challenges in developing necessary competencies.
+
+- Commercial, Industrial, Service Sectors: Growing digital access and stable usage, but significant skills gap.
+
+- Creative Industries and ICT Sector: High levels of access and skills but moderate usage, reflecting different technological needs in workflows.
 
 
-# 7.2. Results III
+
+# 5.2. Results III
 
 ```{r yearTrendReg, echo=FALSE}
 
 #### 3.5. REGION Yearly lineplots by size by revenue ####
 
 # Generate a line plot with access_n and skills_n
+
+# Reordering factor levels using forcats::fct_relevel
+combined_data_harmonized$region <- fct_relevel(combined_data_harmonized$region, 
+                                               "Northwest", "Northeast", "Central", "South", "Insular")
+
 line_plot_by_region <- yearly_stats_and_plot(combined_data_harmonized, 
                                              line_vars = c("access_n", "skills_n", "usage_n"), 
                                              group_var = "region", 
                                              statistic = "median")
 
+
+
 line_plot_by_region
 ```
 
+# Key takeaways III
+
+- Northern and Central Regions:
+
+    - Significant improvements in digital access.
+    - Benefits from robust industrial bases and policy interventions.
+    - Persistent skills gap, slight increase towards the end.
+    
+- South and Insular Regions:
+
+    - Lag behind in both access and skills. Reflecting systemic issues.
+    - Need targeted policy efforts.
+    
+- Usage Trends:
+
+    - Similar trends across regions.
+    - DT integration driven by national policies, market forces, and sectoral requirements.
 
 
-# 8. Q&A
+
+# 6. Q&A
 
 Thank you for your attention
 

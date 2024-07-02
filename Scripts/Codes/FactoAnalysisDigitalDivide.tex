@@ -154,7 +154,7 @@
 \title{Tracking the Digital Divide: Factor Analysis and Time Trends in
 Italian Firms}
 \author{Luis Carlos Castillo}
-\date{30 June 2024}
+\date{02 July 2024}
 \institute{Binational Doctorate\\
 University of Urbino and Universty of Bremen\\
 Ph.D.~Program in Global Studies\\
@@ -167,7 +167,7 @@ Co-Supervisor: Prof.~Dr.~Christian Cordes}
 \begin{frame}{Cumulative Dissertation}
 \phantomsection\label{cumulative-dissertation}
 \begin{center}
-\includegraphics[width=1\textwidth, height=0.75\textheight]{structure_thesis.png}
+\includegraphics[width=1.1\textwidth, height=1.2\textheight]{structure_thesis1.png}
 \end{center}
 \end{frame}
 
@@ -195,11 +195,11 @@ Co-Supervisor: Prof.~Dr.~Christian Cordes}
 \phantomsection\label{objectives}
 \begin{itemize}
 \item
+  Explore changes over time in the digital divide, focusing on
+  differences across firm sizes, sectors, and regions.
+\item
   Develop composite indices to track trends in the first and
   second-level digital divide.
-\item
-  Analyze variations in the first and second-level digital divide across
-  firm sizes, sectors, and regions in Italy.
 \item
   Evaluate the alignment of resources and technology integration theory
   with observed data.
@@ -208,25 +208,7 @@ Co-Supervisor: Prof.~Dr.~Christian Cordes}
 \end{itemize}
 \end{frame}
 
-\begin{frame}{3.1. Research Questions}
-\phantomsection\label{research-questions}
-\begin{itemize}
-\item
-  How does the Resources and Technology Integration theory reflect
-  observed patterns in DT adoption across different Italian enterprises?
-\item
-  What are the evolving patterns and shifts in access, skills, and usage
-  among Italian enterprises, and how do these dynamics reflect the
-  disparities between the three indices across different firm sizes,
-  sectors, and regions over a six-year period?
-\item
-  According to the findings, what policy interventions can be
-  recommended to help Italian enterprises more effectively bridge the
-  digital divide?
-\end{itemize}
-\end{frame}
-
-\begin{frame}{5. Data}
+\begin{frame}{3. Data}
 \phantomsection\label{data}
 \begin{itemize}
 \item
@@ -263,7 +245,7 @@ Co-Supervisor: Prof.~Dr.~Christian Cordes}
 \end{itemize}
 \end{frame}
 
-\begin{frame}{6 Methodology}
+\begin{frame}{4. Methodology}
 \phantomsection\label{methodology}
 \begin{itemize}
 \tightlist
@@ -271,38 +253,118 @@ Co-Supervisor: Prof.~Dr.~Christian Cordes}
   The indices were constructed using dimensionality reduction techniques
   Factor Analysis for Mixed Data (FAMD) and Multiple Correspondence
   Analysis (MCA).
-\item
-  Visualise and measure adoption patterns.
 \end{itemize}
 
-\[ \text{Access Index}_i = a_1 \cdot X1_i + a_2 \cdot X2_i + \ldots + a_6 \cdot X6_i + d \cdot \text{Size}_i \]
-\[ \text{Skills Index}_i = b_1 \cdot Y1_i + b_2 \cdot Y2_i + \ldots + b_6 \cdot Y6_i + e \cdot \text{Size}_i \]
-\[ \text{Usage Index}_i = c_1 \cdot Z1_i + c_2 \cdot Z2_i + \ldots + c_{11} \cdot Z11_i + f \cdot \text{Size}_i \]
+\[ \text{Access Index}_i = \sum_{j=1}^{6} a_j \cdot X_{j,i} \cdot w_i \]
+\[ \text{Skills Index}_i = \sum_{k=1}^{9} b_k \cdot Y_{k,i} \cdot w_i \]
+\[ \text{Usage Index}_i = \sum_{m=1}^{11} c_m \cdot Z_{m,i} \cdot w_i \]
 
 Where \(\mathbf{X}\), \(\mathbf{Y}\), and \(\mathbf{Z}\) are the
 matrices of observations, \(\mathbf{a}\), \(\mathbf{b}\), and
 \(\mathbf{c}\) are the vectors of weights derived from FAMD and MCA
 contributions of each variable to the retained dimensions, and
-\(\text{Size}_i\) represents the firm size control variable with its
-respective weights \(d\), \(e\), and \(f\).
+\(\mathbf{w}\) is the vector of weights accounting for the share of
+groups and years.
+
+\[ \text{Access Index}_i = \sum_{j=1}^{6} a_j \cdot X_{j,i} \]
+\[ \text{Skills Index}_i = \sum_{k=1}^{9} b_k \cdot Y_{k,i} \]
+\[ \text{Usage Index}_i = \sum_{m=1}^{11} c_m \cdot Z_{m,i} \]
 \end{frame}
 
-\begin{frame}{7. Results I}
+\begin{frame}{5. Results I}
 \phantomsection\label{results-i}
 \includegraphics{FactoAnalysisDigitalDivide_files/figure-beamer/yearTrendSize-1.pdf}
 \end{frame}
 
-\begin{frame}{7.1. Results II}
+\begin{frame}{Key takeaways I}
+\phantomsection\label{key-takeaways-i}
+\begin{itemize}
+\item
+  While SMEs can maintain continuous growth in access, larger firms face
+  different challenges.
+\item
+  These findings align with Bratta et al.~(2020), who discuss the
+  hyper-depreciation measure issued in 2016.
+\item
+  SMEs face more challenges in acquiring digital skills. There is a
+  significant shortage of ICT graduates in Italy according to the
+  ``Digital Skills Observatory'' in 2019.
+\item
+  A higher usage index is present in SMEs as existing technologies need
+  to be operated either by outsourcing digital skills or maximising the
+  existing workforce.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{5.1. Results II}
 \phantomsection\label{results-ii}
 \includegraphics{FactoAnalysisDigitalDivide_files/figure-beamer/yearTrendMac-1.pdf}
 \end{frame}
 
-\begin{frame}{7.2. Results III}
+\begin{frame}{Key takeaways II}
+\phantomsection\label{key-takeaways-ii}
+\begin{itemize}
+\item
+  Notable progress in digital access across sectors due to effective
+  policy measures like hyper-depreciation.
+\item
+  The digital skills index remains low, highlighting challenges in
+  developing necessary competencies.
+\item
+  Commercial, Industrial, Service Sectors: Growing digital access and
+  stable usage, but significant skills gap.
+\item
+  Creative Industries and ICT Sector: High levels of access and skills
+  but moderate usage, reflecting different technological needs in
+  workflows.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{5.2. Results III}
 \phantomsection\label{results-iii}
 \includegraphics{FactoAnalysisDigitalDivide_files/figure-beamer/yearTrendReg-1.pdf}
 \end{frame}
 
-\begin{frame}{8. Q\&A}
+\begin{frame}{Key takeaways III}
+\phantomsection\label{key-takeaways-iii}
+\begin{itemize}
+\item
+  Northern and Central Regions:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Significant improvements in digital access.
+  \item
+    Benefits from robust industrial bases and policy interventions.
+  \item
+    Persistent skills gap, slight increase towards the end.
+  \end{itemize}
+\item
+  South and Insular Regions:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Lag behind in both access and skills. Reflecting systemic issues.
+  \item
+    Need targeted policy efforts.
+  \end{itemize}
+\item
+  Usage Trends:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Similar trends across regions.
+  \item
+    DT integration driven by national policies, market forces, and
+    sectoral requirements.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{6. Q\&A}
 \phantomsection\label{qa}
 Thank you for your attention
 \end{frame}
