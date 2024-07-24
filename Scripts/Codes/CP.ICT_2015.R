@@ -133,9 +133,9 @@ vars15 <- var_map$acrom_2
 
 valid_vars15 <- vars15[vars15 %in% colnames(ict_15)]
 
-ICT_2015Rdux <- ict_15[, valid_vars]
+ICT_2015Rdux <- ict_15[, valid_vars15]
 
-vis_miss(ICT_2014Rdux, warn_large_data = FALSE)
+vis_miss(ICT_2015Rdux, warn_large_data = FALSE)
 
 save(ICT_2015Rdux, file = here("Data", "Processed", "ICT_2015Rdux.rda"))
 

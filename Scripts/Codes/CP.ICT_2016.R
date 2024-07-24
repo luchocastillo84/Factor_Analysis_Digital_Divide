@@ -76,7 +76,7 @@ vis_miss(ict_16, warn_large_data = FALSE)
 
 
 ### Converting all the hidden values into NA
-ict_16 <- convert_and_clean(ict_16)
+ict_16 <- convert_and_clean2(ict_16)
 summary(ict_16)
 ### Subsetting the skills varaibles to further imputations
 
@@ -101,6 +101,22 @@ ict_16$clad4 <- forcats::fct_collapse(ict_16$clad4,
                                       cl1 = "cl1",
                                       cl2 = c("cl2", "cl3"),
                                       cl3 = "cl4")
+
+colnames(ICT_2016)
+
+var_map <- read_xlsx(here("Data", "Processed","vars&codes.xlsx"))
+
+vars16 <- var_map$acrom_3
+
+valid_vars16 <- vars16[vars16 %in% colnames(ict_16)]
+
+ICT_2016Rdux <- ict_16[, valid_vars16]
+
+vis_miss(ICT_2016Rdux, warn_large_data = FALSE)
+
+save(ICT_2016Rdux, file = here("Data", "Processed", "ICT_2016Rdux.rda"))
+
+
 
 
 ict_skills_16 <- ict_16 %>% 
