@@ -229,7 +229,7 @@ line_plot_by_smeR
 
 - SMEs face more challenges in acquiring digital skills. There is a significant shortage of ICT graduates in Italy according to the “Digital Skills Observatory” in 2019.
 
-- A higher usage index is present in SMEs as existing technologies need to be operated either by outsourcing digital skills or maximising the existing workforce.
+- Interestingly, we see a higher usage index in SMEs. This is because existing technologies need to be operated, and SMEs often address this by either outsourcing digital skills or maximizing the efficiency of their existing workforce.
 
 
 # 5.1. Results II
@@ -298,7 +298,24 @@ line_plot_by_region
     - Similar trends across regions.
     - DT integration driven by national policies, market forces, and sectoral requirements.
 
+# Evaluating Theory in Light of Data
 
+ While the theory posits a sequential model
+of technology adoption (access → skills → usage), our data shows that
+skills development has not kept pace with access, and usage sometimes
+surpasses skills. This indicates that firms may adopt technologies
+without fully developing digital skills, relying on external support or
+simpler applications.
+
+# Key Interventions
+
+Accelerate Digital Skills Acquisition: Promoting e-learning
+platforms and certification programs for rapid, flexible digital skills
+training.
+
+Enhance Digital Infrastructure and Support for SMEs in Lagging Regions:
+Expand broadband and mobile network coverage in under-served regions
+through public-private partnerships.
 
 # 6. Q&A
 
