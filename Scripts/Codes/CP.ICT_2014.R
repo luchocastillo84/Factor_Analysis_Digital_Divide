@@ -62,6 +62,11 @@ ICT_2014 <- read.csv(here("Data", "Raw","ICT_Microdati_Anno_2014.txt"),
                      header = TRUE, sep = "\t")
 
 
+
+
+
+
+
 summary(as.numeric(ICT_2014$C2))
 
 summary(as.numeric(ict_14cP$C2))
@@ -101,7 +106,7 @@ ict_14 <- read.csv(here("Data", "Raw","ICT_Microdati_Anno_2014.txt"),
 vis_miss(ict_14, warn_large_data = FALSE)
 
 ### Converting all the hidden values into NA
-ict_14 <- convert_and_clean(ict_14)
+ict_14 <- convert_and_clean2(ict_14)
 
 ### Subsetting the skills varaibles to further imputations
 
@@ -128,6 +133,19 @@ ict_14$clad4 <- forcats::fct_collapse(ict_14$clad4,
                                       cl2 = c("cl2", "cl3"),
                                       cl3 = "cl4")
 
+colnames(ICT_2014)
+
+var_map <- read_xlsx(here("Data", "Processed","vars&codes.xlsx"))
+
+vars14 <- var_map$acrom_1
+
+valid_vars <- vars14[vars14 %in% colnames(ict_14)]
+
+ICT_2014Rdux <- ict_14[, valid_vars]
+
+vis_miss(ICT_2014Rdux, warn_large_data = FALSE)
+
+save(ICT_2014Rdux, file = here("Data", "Processed", "ICT_2014Rdux.rda"))
 
 
 ict_skills_14 <- ict_14 %>% 
