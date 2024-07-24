@@ -125,6 +125,22 @@ ict_15$clad4 <- forcats::fct_collapse(ict_15$clad4,
                                        cl3 = "cl4")
 
 
+colnames(ICT_2015)
+
+var_map <- read_xlsx(here("Data", "Processed","vars&codes.xlsx"))
+
+vars15 <- var_map$acrom_2
+
+valid_vars15 <- vars15[vars15 %in% colnames(ict_15)]
+
+ICT_2015Rdux <- ict_15[, valid_vars]
+
+vis_miss(ICT_2014Rdux, warn_large_data = FALSE)
+
+save(ICT_2015Rdux, file = here("Data", "Processed", "ICT_2015Rdux.rda"))
+
+
+
 
 ict_skills_15 <- ict_15 %>% 
   dplyr::select(Codice, clad4, ateco_1, rip, C4, C9a, C9c, B5a, 
