@@ -75,7 +75,35 @@ summary(ict_19)
 vis_miss(ict_19, warn_large_data = FALSE)
 
 ### Converting all the hidden values into NA
-ict_19 <- convert_and_clean(ict_19)
+ict_19 <- convert_and_clean2(ict_19)
+
+colnames(ICT_2019)
+
+# Load the tools package if it's not already loaded
+if (!require(tools)) install.packages("tools", dependencies = TRUE)
+library(tools)
+# Convert column names to title case
+colnames(ict_19)[3:150] <- tools::toTitleCase(colnames(ict_19)[3:150])
+
+# Check the updated column names
+colnames(ict_19)
+
+
+var_map <- read_xlsx(here("Data", "Processed","vars&codes.xlsx"))
+
+vars19 <- var_map$acrom_6
+
+valid_vars19 <- vars19[vars19 %in% colnames(ict_19)]
+
+
+
+ICT_2019Rdux <- ict_19[, valid_vars19]
+
+vis_miss(ICT_2019Rdux, warn_large_data = FALSE)
+
+save(ICT_2019Rdux, file = here("Data", "Processed", "ICT_2019Rdux.rda"))
+
+
 
 
 ### Subsetting the skills varaibles to further imputations
