@@ -62,7 +62,7 @@ vis_miss(ict_18, warn_large_data = FALSE)
 ### Converting all the hidden values into NA
 ict_18 <- convert_and_clean2(ict_18)
 
-colnames(ICT_2018)
+colnames(ict_18)
 
 var_map <- read_xlsx(here("Data", "Processed","vars&codes.xlsx"))
 
