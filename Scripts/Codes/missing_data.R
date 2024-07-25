@@ -25,6 +25,8 @@ library(fastDummies)
 library(janitor)
 library(stringr)
 
+load( here("Scripts", "Environments", "missing_values.RData"))
+
 
 load( here("Data", "Processed", "ICT_2014Rdux.rda"))
 load( here("Data", "Processed", "ICT_2015Rdux.rda"))
@@ -46,6 +48,7 @@ ICT_2018Rdux$C10a <- NA
 ICT_2018Rdux$C10c <- NA
 ICT_2018Rdux$C9g <- NA
 
+ICT_2017Rdux <- ICT_2017Rdux[, c(1:6, 25,8:24)]
 ICT_2018Rdux <- ICT_2018Rdux[, c(1:13, 23:25,14:22)]
 
 

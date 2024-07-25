@@ -1,0 +1,155 @@
+---
+title: "Tests Before Factor Analysis"
+author: "Luis Carlos Castillo"
+date: "`r Sys.Date()`"
+institute: |
+  | 
+  | University of Urbino and Universty of Bremen
+fontsize: 9pt
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{graphicx}
+  - \setbeamerfont{normal text}{size=\tiny} # Adjust this line as needed
+output:
+  beamer_presentation: default
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE}
+#### 0. Load the necessary packages #####
+library(readr)
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(here)
+library(git2r)
+library(visdat)
+library(naniar)
+library(chatgpt)
+library(gptstudio)
+require(devtools)
+library(caret)
+library(mice)
+library(knitr)
+library(kableExtra)
+library(corrplot)
+library(forcats)
+library(DescTools)
+library(fastDummies)
+library(corrplot)
+library(Compind)
+library(lme4)
+library(Matrix)
+library(ltm)
+
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = F, message = F )
+kableExtra.auto_format = FALSE
+knitr.table.format = "latex"
+knitr::opts_knit$set(kable.force.latex = TRUE)
+
+```
+
+
+```{r load_data, echo=FALSE}
+
+load( here("Scripts", "Environments", "missing_values.RData"))
+var_map <- read_xlsx(here("Data", "Processed","vars&codes.xlsx"))
+
+```
+
+## Importand considerations
+
+In the process of selecting variables consistent across all six years of the ICT usage in enterprises survey (2014-2019), conducted by ISTAT, several challenges were encountered due to variations in variable codification and measurement across different years. These discrepancies suggest that the survey's methodology evolved over time, possibly to adapt to changes in technology or business practices, which occasionally led to alterations in how certain variables were defined or measured.
+
+It is important for readers to be aware that, although the variable names and codes may vary from year to year, careful review has been conducted to ensure that each selected variable consistently measures the intended construct over the entire period. This preparatory work is critical for the next step of the analysis, which will involve data imputation to address any missing or inconsistent data points, thereby preserving the integrity of the analysis.
+
+## List of selected variables
+
+
+```{r variables, echo=FALSE}
+
+vars_14_19 <- var_map[, 1:7]
+
+# Assuming vars_14_19 is your DataFrame
+colnames(vars_14_19) <- c("name_EN", "ict2014", "ict2015", "ict2016", "ict2017", "ict2018", "ict2019")
+
+
+kable(vars_14_19, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 4)  
+
+
+
+```
+
+## Missing values for 2014
+
+In the analysis of the ICT usage in enterprises survey data from 2014 to 2019, notable gaps in data availability were identified for several key variables, notably variable B5A. This variable presents a unique challenge, with 100% missing data in 2014, reappearing in subsequent years but missing again in 2017 and 2019. These gaps are attributed to changes in the survey's measurement approach and question modifications over the specified years.
+
+To address these inconsistencies and ensure the continuity of our dataset for longitudinal analysis, a strategic imputation approach will be employed. For variable B5A, missing values will be imputed by interpolating or extrapolating from available data points in the adjacent years where the variable is present. This method aims to reconstruct the missing data based on observable trends and values from 2015 and 2018.
+
+Additionally, other variables with approximately 26% missing data will undergo imputation using data from 2014. This approach leverages the more complete dataset from the earliest year in the survey series to fill in gaps in subsequent years, ensuring a robust dataset for comprehensive analysis. This paragraph aims to transparently communicate the methodological adjustments made to compensate for data irregularities across different survey years.
+
+## Missing chart 2014 
+
+```{r missing2014, echo=FALSE}
+
+vis_miss(ICT_2014Rdux, warn_large_data = FALSE)
+
+
+```
+
+##
+
+```{r missing2015, echo=FALSE}
+
+
+vis_miss(ICT_2015Rdux, warn_large_data = FALSE)
+
+
+```
+
+##
+
+```{r missing2016, echo=FALSE}
+
+
+vis_miss(ICT_2016Rdux, warn_large_data = FALSE)
+
+
+```
+
+
+##
+
+
+```{r missing2017, echo=FALSE}
+
+
+vis_miss(ICT_2017Rdux, warn_large_data = FALSE)
+
+
+```
+
+##
+
+```{r missing2018, echo=FALSE}
+
+
+vis_miss(ICT_2018Rdux, warn_large_data = FALSE)
+
+
+```
+
+##
+
+```{r missing2019, echo=FALSE}
+
+
+vis_miss(ICT_2019Rdux, warn_large_data = FALSE)
+
+
+```
+
+
