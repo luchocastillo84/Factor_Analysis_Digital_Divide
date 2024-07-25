@@ -60,7 +60,23 @@ ict_18 <- rename(ict_18, clad4 = clad3, ateco_1 = Ateco_1)
 vis_miss(ict_18, warn_large_data = FALSE)
 
 ### Converting all the hidden values into NA
-ict_18 <- convert_and_clean(ict_18)
+ict_18 <- convert_and_clean2(ict_18)
+
+colnames(ICT_2018)
+
+var_map <- read_xlsx(here("Data", "Processed","vars&codes.xlsx"))
+
+vars18 <- var_map$acrom_5
+
+valid_vars18 <- vars18[vars18 %in% colnames(ict_18)]
+
+ICT_2018Rdux <- ict_18[, valid_vars18]
+
+vis_miss(ICT_2018Rdux, warn_large_data = FALSE)
+
+save(ICT_2018Rdux, file = here("Data", "Processed", "ICT_2018Rdux.rda"))
+
+
 
 ### Subsetting the skills varaibles to further imputations
 ict_skills_18 <- ict_18 %>% 
