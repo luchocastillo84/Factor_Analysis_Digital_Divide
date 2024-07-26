@@ -105,6 +105,41 @@ kable(counts_clad4_by_year1, "latex", longtable = F, booktabs = T, escape = T) %
 
 In this study, firm size using 3 levels, measured by revenue, was included as an active variable in the factor analysis to control for its influence on other variables. This approach ensures that the extracted factors account for size-related variations, enhancing their interpretability and providing a comprehensive understanding of the data. Incorporating firm size allows for a more accurate and representative analysis of the underlying data structure.
 
+## Revenue variable for firm size classification
+
+
+The table below, based on ISTAT survey's documentation, outlines the revenue thresholds used for classifying firms by annual turnover. This classification is crucial for analyzing digital technology adoption across different enterprise sizes, ensuring a standardized approach according to European Commission guidelines.
+
+
+```{r sizeRevenue, echo=FALSE}
+
+options(scipen = 999)
+
+thresholds <- data.frame(
+  Revenue_label = c(0, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000, 4000000, 5000000, 10000000, 20000000, 50000000, 200000000),
+  Threshold = c("[0, 20000)", "[20000, 50000)", "[50000, 100000)", "[100000, 200000)", "[200000, 500000)", "[500000, 1000000)", 
+                  "[1000000, 2000000)", "[2000000, 4000000)", "[4000000, 5000000)", "[5000000, 10000000)", "[10000000, 20000000)", 
+                  "[20000000, 50000000)", "[50000000, 200000000)", "[200000000, + inf)")
+)
+
+kable(thresholds, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 5, latex_options = c("repeat_header")) %>%   pack_rows("",1,14)
+
+
+```
+
+## Firm size classification
+
+
+The revenue variable is categorized into 11 thresholds. Firms are classified based on the Commission Recommendation of 6 May 2003:
+
+1. **Small Enterprises**: Annual turnover not exceeding EUR 10 million.
+2. **Medium Enterprises**: Annual turnover not exceeding EUR 50 million.
+3. **Large Enterprises**: Annual turnover exceeding EUR 50 million.
+
+These thresholds, as defined by the European Commission, ensure standardized firm size classification.
+
+
 
 ## Variables 
 
@@ -115,9 +150,34 @@ In total there are 29 variables use to extract the factors that represent each c
  - For the usage index 11 variables + 3 size variables (small, medium, large)
 
 
-## ACCESS variables I
+## Variable Naming Conventions
 
-These variables include continuous and binary variables' in total there are 6 variables. There is one variables for incentives access and five for physical access measuring computers and internet connectivity.
+The variables in this study are categorized to reflect different aspects of digital technology adoption:
+
+- **A (Access)**: Includes 'A1' for incentives and 'A2' for physical access.
+- **S (Skills)**: Measures digital skills within the enterprise, from ICT training and maintenance to advanced IT management.
+- **U (Usage)**: Assesses the use of digital technologies in various operations:
+  - **UM**: Management, including using ERP and CRM and human resources managemenet.
+  - **UMK**: Marketing, focusing on digital marketing and sales.
+  - **UC**: Commerce, tracking e-commerce and online transactions.
+
+These conventions ensure clear identification and logical grouping of variables, facilitating streamlined analysis and interpretation.
+
+
+
+
+## ACCESS Variables I
+
+
+The 'ACCESS' category includes six variables, split into continuous and binary types, organized into two subcategories that highlight different facets of digital access:
+
+1. **Incentives for Access (A1)**:
+   - This includes a single variable, "IT training courses for employees without specialist ICT skills," aimed at fostering digital adoption by equipping employees with necessary skills.
+
+2. **Physical Access (A2)**:
+   - With five variables, this group measures physical aspects of digital access like computer availability and internet connectivity, critical for operational effectiveness and digital engagement in a competitive market.
+
+
 
 ## ACCESS variables II (Incentives)
 
@@ -313,7 +373,11 @@ kable(A2_C4_high_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
 
 ## SKILLS variables I
 
-11 variables were selected, these variables include only binary variables. It represents the digital skills withing the enterprise. Measuring ICT training and the use of internal personnel to develop ICT tasks.
+
+This category encompasses nine binary variables identified by the prefix "S", which measure the presence and utilization of internal personnel for ICT tasks within enterprises. These variables span a range of functions from infrastructure maintenance to web development and IT security management, reflecting the enterprise's depth of digital skills and training in key ICT domains.
+
+
+
 
 ## SKILLS variables II 
 
@@ -498,7 +562,16 @@ kable(S_B5g1_summary, "latex", longtable = F, booktabs = T, escape = T) %>%
 
 ## USAGE variables I
 
-These variables include only binary variables, we selected 11 variables. It measures how the enterprise use a variety of digital technologies in different business operations in marketing, management, e-commerce and human resources.
+
+
+This section details the usage category, which consists of 11 binary variables prefixed with "U", delineating how enterprises apply digital technologies across various functional domains. These variables are structured into distinct groups representing different business operations:
+
+- **UM (Management)**: Variables under this prefix measure the integration of digital tools such as ERP and CRM in management processes and  human resources management.
+- **UMK (Marketing)**: These variables assess digital applications in marketing activities.
+- **UC (Commerce)**: This group captures the use of digital technologies in e-commerce operations.
+
+This classification helps highlight the diverse applications of digital technologies and the specific business functions they enhance within the enterprise.
+
 
 
 ## USAGE variables II (Marketing)
