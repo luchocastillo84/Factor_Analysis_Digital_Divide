@@ -1,5 +1,5 @@
 ---
-title: "Tests Before Factor Analysis"
+title: "Missing Data"
 author: "Luis Carlos Castillo"
 date: "`r Sys.Date()`"
 institute: |
@@ -83,6 +83,41 @@ kable(vars_14_19, "latex", longtable = F, booktabs = T, escape = T) %>%
 
 ```
 
+## Summary of Variables with 100% Missing Data (2014-2019)
+
+```{r missing100, echo=FALSE}
+
+# Create the table for variables with 100% missing data
+missing_100_data <- data.frame(
+  Year = c("2014", "2015", "2016", "2017", "2018", "2019"),
+  "Variables_with_all_Missing_Values" = c("B5a", "-", "-", "B5a, C10a, C10c, C9g, D1, D2a, D2b", "C10a, C10c, C9g", "B5a")
+)
+
+kable(missing_100_data, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 5)  %>%   pack_rows("",1,6)
+
+```
+
+
+This table provides a concise view of the variables within the ICT usage in enterprises survey that were entirely absent in specific years. Notably, the variable B5a has recurrently been missing across multiple years, pointing to significant discontinuities in the data collection or changes in survey focus. Other variables, particularly C10a, C10c, and C9g, also show repeated instances of complete data absence, primarily in the later years of the survey. This summary assists in identifying patterns of missing data and facilitates targeted approaches for data imputation and analysis continuity.
+
+## Summary of Variables with Low Levels of Missing Data (2014-2019)
+
+```{r low_missing, echo=FALSE}
+
+# Create the table for variables with low levels of missing data
+low_missing_data <- data.frame(
+  Year = c("2014", "2015", "2016", "2017", "2018", "2019"),
+  "Variables_with_Low_Missing_Data" = c("C3a, C9c", "C8g, C8h, C9c", "C9a, C9c, C9f, C9g", "C8g, C9f", "C9a, C9c, C9f", "C8a, C8c, C8f, C8g") 
+)
+
+kable(low_missing_data, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 5)  %>%   pack_rows("",1,6)
+
+```
+
+This table outlines the variables within the ICT usage in enterprises survey that exhibited low but notable missing data percentages, approximately between 21% and 26%, across different survey years. It illustrates that certain variables, such as C8g and C9c, frequently appear with missing data, suggesting recurring issues with these specific survey items. Understanding the patterns of these less significantly missing variables helps in applying consistent and appropriate imputation techniques to address these gaps, thus enhancing the overall data quality and reliability for subsequent analysis.
+
 ## Missing values for 2014
 
 The missing data chart for 2014 highlights some significant challenges in data continuity for certain variables in the ICT usage in enterprises survey. Notably, the variable B5a exhibits a complete absence of data for this year, while other variables such as C8a, C8c, C8g, C8h  have missing values up to 26%. The gap in B5a is the result of changes in the survey's measurement approaches and modifications in variable codification over different survey iterations, while the other variables are missing at random. 
@@ -100,9 +135,9 @@ vis_miss(ICT_2014Rdux, warn_large_data = FALSE)
 
 ## Missing values for 2015
 
-The 2015 missing data chart for the ICT usage in enterprises survey indicates various levels of missingness among the variables, with some showing significant gaps. Notably, variable C9c displays approximately 24% missing data. Other variables such as B5a and C4 exhibit lower missing data percentages but are still noteworthy for the purposes of this study.
+The 2015 missing data chart for the ICT usage in enterprises survey indicates various levels of missingness among the variables, with some showing significant gaps. Notably, variable C8a, C8c, C8g, and C8h displays approximately 24% missing data. Other variables exhibit lower missing data percentages but are still noteworthy for the purposes of this study.
 
-To address these data gaps, we will employ imputation methods tailored to the specific characteristics and missing data patterns of each variable. For variables with relatively high missing data like C9c, C8g, and C8h, the imputation process will likely involve more sophisticated statistical techniques that can utilize the available data efficiently to estimate the missing values. 
+To address these data gaps, we will employ imputation methods tailored to the specific characteristics and missing data patterns of each variable.
 
 ## Missing chart 2015
 
@@ -114,7 +149,14 @@ vis_miss(ICT_2015Rdux, warn_large_data = FALSE)
 
 ```
 
-##
+## Missing values for 2016
+
+The 2016 missing data chart for the ICT usage in enterprises survey indicates various levels of missingness among the variables, with some showing significant gaps. Notably, variable C9a, C9c, C9f, and C9g displays approximately 22% missing data. Other variables exhibit lower missing data percentages but are still noteworthy for the purposes of this study.
+
+To address these data gaps, we will employ imputation methods tailored to the specific characteristics and missing data patterns of each variable.
+
+## Missing chart 2016
+
 
 ```{r missing2016, echo=FALSE}
 
@@ -124,8 +166,15 @@ vis_miss(ICT_2016Rdux, warn_large_data = FALSE)
 
 ```
 
+## Missing values for 2017
 
-##
+The 2017 missing data chart for the ICT usage in enterprises survey reveals significant gaps in data availability due to changes in the questionnaire, leading to the discontinuation of several variables including B5a, C10a, C10c, C9g, D1, D2a, and D2b, each showing 100% missing data. These substantial data omissions are the result of modifications to the survey's focus and question set.
+
+To mitigate the impact of these missing values, we will apply interpolation techniques for the variables that have been intermittently recorded over the years. This method will allow us to estimate missing values by leveraging trends and patterns from available data in other years where these variables were included.
+
+Additionally, for variables such as C8g and C9f, which exhibit up to 22% missing data, we will employ imputation methods that utilize the existing data within the same year. These approaches are designed to enhance data completeness and ensure the robustness of subsequent analyses, thereby maintaining the integrity of the study despite the survey's evolving structure.
+
+## Missing chart 2017
 
 
 ```{r missing2017, echo=FALSE}
@@ -136,7 +185,14 @@ vis_miss(ICT_2017Rdux, warn_large_data = FALSE)
 
 ```
 
-##
+
+## Missing values for 2018
+
+The 2018 missing data chart reveals continued issues with data continuity, particularly for variables C10a, C10c, and C9g, each persisting at 100% missing. This pattern highlights the ongoing challenges related to survey changes over the years.
+
+Additionally, variables such as C9a, C9c, and C9f display 21% missing data, suggesting recurrent gaps. To address these issues, interpolation will be used for variables with complete data gaps, leveraging trends from available years. For those with partial missing data, imputation will utilize existing data from the same year to ensure comprehensive and accurate analysis across the dataset.
+
+## Missing chart 2018
 
 ```{r missing2018, echo=FALSE}
 
@@ -146,7 +202,14 @@ vis_miss(ICT_2018Rdux, warn_large_data = FALSE)
 
 ```
 
-##
+
+## Missing values for 2019
+
+The 2019 missing data chart for the ICT usage in enterprises survey shows that variable B5a continues to have 100% missing data, highlighting a consistent absence across several years. Additionally, variables C8a, C8c, C8f, and C8g each report 21% missing data.
+
+To address these gaps, B5a will undergo interpolation using related data from other years where it was recorded, ensuring a more complete dataset for analysis. For the variables with 21% missing data, we will apply imputation techniques that leverage the available data within the same year to fill these gaps, thereby maintaining the analytical integrity of the survey data.
+
+## Missing chart 2019
 
 ```{r missing2019, echo=FALSE}
 
