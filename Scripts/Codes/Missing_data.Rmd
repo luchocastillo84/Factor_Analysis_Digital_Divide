@@ -1,5 +1,5 @@
 ---
-title: "Missing Data"
+title: "Missing Data & Imputation Mthods for ICT-USage in Enterprises"
 author: "Luis Carlos Castillo"
 date: "`r Sys.Date()`"
 institute: |
@@ -83,6 +83,13 @@ kable(vars_14_19, "latex", longtable = F, booktabs = T, escape = T) %>%
 
 ```
 
+
+## Imputation Methods for Variables with 100% Missing Data (2014-2019)
+
+To address the discontinuities in certain survey questions across different years, stratified imputation methodology was employed. This approach was used for variables that are entirely missing 
+in specific years due to changes in the survey design. A composite strata variable by combining company size, sector, and region was created. For each variable with missing data, we calculated the proportion of responses (e.g., the proportion of UM_E1—Using ERP software—being 1) within each stratum, using data from years where the variable was available. Assuming these proportions remain stable over time, this proportions were used to impute the missing values in the discontinuous years. This involved determining the number of cases to impute for each stratum, calculating the expected counts of 1s and 0s based on the historical proportions, and assigning these values randomly to maintain variability. This robust approach ensures that the imputed data accurately reflects the patterns observed in similar firms, thereby preserving the integrity and continuity of the dataset for comprehensive analysis.
+
+
 ## Summary of Variables with 100% Missing Data (2014-2019)
 
 ```{r missing100, echo=FALSE}
@@ -100,6 +107,11 @@ kable(missing_100_data, "latex", longtable = F, booktabs = T, escape = T) %>%
 
 
 This table provides a concise view of the variables within the ICT usage in enterprises survey that were entirely absent in specific years. Notably, the variable B5a has recurrently been missing across multiple years, pointing to significant discontinuities in the data collection or changes in survey focus. Other variables, particularly C10a, C10c, and C9g, also show repeated instances of complete data absence, primarily in the later years of the survey. This summary assists in identifying patterns of missing data and facilitates targeted approaches for data imputation and analysis continuity.
+
+
+## Imputatıon Methods for Variables with Low Levels of Missing Data (2014-2019)
+
+To handle the low missing values in the dataset, the mice package for multiple imputation was used. This process involved generating multiple imputed datasets to account for the uncertainty associated with missing data. Depending on the nature of the variable categorical or continuous different imputation methods were used, such as Predictive Mean Matching (pmm), Random Forest (rf), Classification and Regression Trees (cart), logistic regression (logreg) and random sample from observed values (sample). For each method, five imputed datasets with fifteen iterations to ensure convergence were created. Following the imputation, regression analyses to evaluate the performance of each method was conducted, using accuracy metrics to determine the best model. The method with the highest accuracy was then selected, and the corresponding imputed dataset was integrated into the original dataframe. This systematic approach ensured a robust handling of missing data, enhancing the reliability and interpretability of our subsequent analyses.
 
 ## Summary of Variables with Low Levels of Missing Data (2014-2019)
 
