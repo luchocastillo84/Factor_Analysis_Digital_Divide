@@ -1,15 +1,12 @@
-# Load necessary libraries
 library(dplyr)
-library(broom)
 
-# Function to perform hypothesis testing
 perform_hypothesis_test <- function(data, continuous_vars = NULL, binary_vars = NULL, alpha = 0.05) {
-
+  
   # Ensure the year variable is a factor
   data <- data %>% mutate(year = as.factor(year))
-
+  
   results <- list()
-
+  
   # Perform ANOVA for continuous variables
   if (!is.null(continuous_vars)) {
     for (var in continuous_vars) {
@@ -24,7 +21,7 @@ perform_hypothesis_test <- function(data, continuous_vars = NULL, binary_vars = 
           Variable = var,
           Test = "ANOVA",
           Test_Statistic = test_statistic,
-          P_Value = p_value,
+          P_Value = sprintf("%.4f", p_value),
           Decision = decision
         )
         results <- append(results, list(result))
@@ -33,7 +30,7 @@ perform_hypothesis_test <- function(data, continuous_vars = NULL, binary_vars = 
       }
     }
   }
-
+  
   # Perform chi-squared tests for binary variables
   if (!is.null(binary_vars)) {
     for (var in binary_vars) {
@@ -47,7 +44,7 @@ perform_hypothesis_test <- function(data, continuous_vars = NULL, binary_vars = 
           Variable = var,
           Test = "Chi-Squared Test",
           Test_Statistic = test_statistic,
-          P_Value = p_value,
+          P_Value = sprintf("%.4f", p_value),
           Decision = decision
         )
         results <- append(results, list(result))
@@ -56,12 +53,13 @@ perform_hypothesis_test <- function(data, continuous_vars = NULL, binary_vars = 
       }
     }
   }
-
+  
   # Combine results into a single data frame
   results_df <- do.call(rbind, results)
-
+  
   return(results_df)
 }
+
 # # 
 # # # Example usage with your data
 # # # Replace the variable names with actual names from your data

@@ -27,6 +27,7 @@ library(Matrix)
 library(ltm)
 library(psych)
 library(reshape2)
+library(writexl)
 
 load(file = here("Scripts", "Environments", "FactoAnalysisPreProcess.RData"))
 
@@ -172,6 +173,41 @@ corr_A2014 <- corrplot(cor_matrix_sortedA14, method = "square", order = "origina
 
 corr_A2014
 
+### Cronbach Alpha Continuous 
+cont_alpha_A2014 <- results[["2014"]]$A_continuous_reliability$total
+cont_alpha_A2014 <- cont_alpha_A2014[, -c(6:9)]
+cont_alpha_A2014$Var_type <- "Continuous"
+
+### Cronbach Alpha Binary 
+binary_alpha_A2014 <- results[["2014"]]$A_binary_reliability$total
+binary_alpha_A2014 <- binary_alpha_A2014[, -c(6:9)]
+binary_alpha_A2014$Var_type <- "Binary"
+
+### Cronbach Alpha Combined 
+comb_alpha_A2014 <- results[["2014"]]$A_combined_reliability$total
+comb_alpha_A2014 <- comb_alpha_A2014[, -c(6:9)]
+comb_alpha_A2014$Var_type <- "Combined"
+
+cromb_alpha_access14 <- rbind(cont_alpha_A2014, binary_alpha_A2014,comb_alpha_A2014)
+
+write_xlsx(cromb_alpha_access14, here("Data", "Processed", "cromb_alpha_access14.xlsx"))
+
+
+# Perform Bartlett's Test of Sphericity
+bartlett_test_A14 <- cortest.bartlett(cor_matrix_sortedA14, nrow(A_data_2014))
+
+# Check the structure of bartlett_test_A14 to ensure the expected attributes
+str(bartlett_test_A14)
+
+# Extract the results and format the p-value to 4 decimal places
+bartlett_test_A14_df <- data.frame(
+  Statistic = round(bartlett_test_A14$chisq, 3),
+  Degrees_of_Freedom = bartlett_test_A14$df,
+  p_Value = sprintf("%.4f", bartlett_test_A14$p.value)
+)
+
+write_xlsx(bartlett_test_A14_df, here("Data", "Processed", "bartlett_test_A14.xlsx"))
+
 ##### Skills  ####
 
 
@@ -198,7 +234,23 @@ cor_matrix_sortedS14 <- cor(S_data_2014_sorted, use = "complete.obs")
 # Plot the sorted correlation matrix
 corr_S2014 <- corrplot(cor_matrix_sortedS14, method = "square", order = "original", tl.col = "red", tl.srt = 45)
 
+cont_alpha_S2014 <- results[["2014"]]$S_reliability$total
+cont_alpha_S2014 <- cont_alpha_S2014[, -c(6:9)]
 
+
+# Perform Bartlett's Test of Sphericity
+bartlett_test_S14 <- cortest.bartlett(cor_matrix_sortedS14, nrow(S_data_2014))
+
+# Check the structure of bartlett_test_A14 to ensure the expected attributes
+str(bartlett_test_S14)
+
+# Extract the results and format the p-value to 4 decimal places
+bartlett_test_S14_df <- data.frame(
+  Statistic = round(bartlett_test_S14$chisq, 3),
+  Degrees_of_Freedom = bartlett_test_S14$df,
+  p_Value = sprintf("%.4f", bartlett_test_S14$p.value)
+)
+write_xlsx(bartlett_test_S14_df, here("Data", "Processed", "bartlett_test_S14.xlsx"))
 
 ##### Usage  ####
 
@@ -224,6 +276,25 @@ cor_matrix_sortedU14 <- cor(U_data_2014_sorted, use = "complete.obs")
 # Plot the sorted correlation matrix
 corr_U2014 <- corrplot(cor_matrix_sortedU14, method = "square", order = "original", tl.col = "red", tl.srt = 45)
 
+cont_alpha_U2014 <- results[["2014"]]$U_reliability$total
+cont_alpha_U2014 <- cont_alpha_U2014[, -c(6:9)]
+
+
+# Perform Bartlett's Test of Sphericity
+bartlett_test_U14 <- cortest.bartlett(cor_matrix_sortedU14, nrow(U_data_2014))
+
+# Check the structure of bartlett_test_A14 to ensure the expected attributes
+str(bartlett_test_U14)
+
+# Extract the results and format the p-value to 4 decimal places
+bartlett_test_U14_df <- data.frame(
+  Statistic = round(bartlett_test_U14$chisq, 3),
+  Degrees_of_Freedom = bartlett_test_U14$df,
+  p_Value = sprintf("%.4f", bartlett_test_U14$p.value)
+)
+
+# Assuming bartlett_test_U14_df is your data frame
+write_xlsx(bartlett_test_U14_df, here("Data", "Processed", "bartlett_test_U14.xlsx"))
 
 
 
@@ -711,7 +782,6 @@ test_results_Access <- perform_hypothesis_test(A_combined,
                                                continuous_vars, 
                                                binary_varsA)
 
-test_results_Access$P_Value <- round(test_results_Access$P_Value, 3)
 
 
 ###### Skills #### 
@@ -733,7 +803,7 @@ options(scipen=999)
 test_results_Skills <- perform_chisq_test(S_combined, 
                                                binary_varsS)
 
-test_results_Skills$P_Value <- round(test_results_Skills$P_Value, 3)
+
 
 
 
@@ -756,7 +826,6 @@ options(scipen=999)
 test_results_Usage <- perform_chisq_test(U_combined, 
                                           binary_varsU)
 
-test_results_Usage$P_Value <- round(test_results_Usage$P_Value, 3)
 
 
 

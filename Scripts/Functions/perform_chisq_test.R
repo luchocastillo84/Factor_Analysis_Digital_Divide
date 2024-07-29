@@ -23,7 +23,7 @@ perform_chisq_test <- function(data, binary_vars, alpha = 0.05) {
           Variable = var,
           Test = "Chi-Squared Test",
           Test_Statistic = test_statistic,
-          P_Value = p_value,
+          P_Value = sprintf("%.4f", p_value),
           Decision = decision
         )
         results <- append(results, list(result))
@@ -40,8 +40,9 @@ perform_chisq_test <- function(data, binary_vars, alpha = 0.05) {
   
   return(results_df)
 }
-# 
-# # Example usage with your data
+
+# Example usage with your data
 # test_results_binary <- perform_chisq_test(A_data_combined, binary_vars = c("A1_B2b", "A2_C5a", "A2_C4_low", "A2_C4_high"))
 # 
 # print(test_results_binary)
+
