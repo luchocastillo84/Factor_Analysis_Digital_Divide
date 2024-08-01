@@ -160,6 +160,9 @@ results_access_2014w <- comp_index_dd_mixed(data =  A_data_2014,
                                            weights = A_data_2014$weight)
 # summary(results_access_2014w$famd_results$ind$contrib[,2])
 eigenvalues_2014_access
+eigen_A2014 <- round(as.data.frame(eigenvalues_2014_access),5)
+write_xlsx(eigen_A2014, here("Data", "Processed", "eigen_A2014.xlsx"))
+
 scree_plot_2014_access
 contrib_2014_access_D1
 contrib_2014_access_D2
@@ -175,9 +178,10 @@ results_skills_2014w <- comp_index_dd_mca(data =  S_data_2014,
                                          index = "skills", 
                                          year = 2014,
                                          weights = S_data_2014$weight)
-FAMD()
-MCA
+
 eigenvalues_2014_skills
+eigen_S2014 <- round(as.data.frame(eigenvalues_2014_skills),5)
+write_xlsx(eigen_S2014, here("Data", "Processed", "eigen_S2014.xlsx"))
 scree_plot_2014_skills
 contrib_2014_skills_D1
 contrib_2014_skills_D2
@@ -195,6 +199,9 @@ results_usage_2014w <- comp_index_dd_mca(data = U_data_2014,
                                         year = 2014,
                                         weights = U_data_2014$weight)
 eigenvalues_2014_usage
+eigen_U2014 <- round(as.data.frame(eigenvalues_2014_usage),5)
+write_xlsx(eigen_U2014, here("Data", "Processed", "eigen_U2014.xlsx"))
+
 scree_plot_2014_usage
 contrib_2014_usage_D1
 contrib_2014_usage_D2
