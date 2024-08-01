@@ -30,6 +30,7 @@ library(caret)
 library(mice)
 library(knitr)
 library(kableExtra)
+library(writexl)
 
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(echo = FALSE, warning = F, message = F )
@@ -211,6 +212,8 @@ get_binary_summary_stats_by_group <- function(df, group_var, summary_var) {
 
 # Example usage:
 A1_B2b_summary <- get_binary_summary_stats_by_group(ict_combined, "year", "A1_B2b")
+
+write_xlsx(A1_B2b_summary, here("Data", "Processed", "A1_B2b_summary.xlsx"))
 
 # Make sure to use the format "latex" for PDF output
 

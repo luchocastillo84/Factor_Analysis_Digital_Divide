@@ -70,6 +70,8 @@ sectors <- ict_combined %>%
 
 rownames(sectors) <- NULL
 
+write_xlsx(sectors, here("Data", "Processed", "sectors.xlsx"))
+
 kable(sectors,  "latex", longtable = F, booktabs = T, escape = T) %>%
   kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   
   pack_rows("",1,11)
@@ -136,6 +138,9 @@ ict_wide_prop <- ict_summary1 %>%
 kable(ict_wide_prop, "latex", longtable = F, booktabs = TRUE, escape = T) %>%
   kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%
   pack_rows("", 1, 11)
+
+write_xlsx(ict_wide_prop, here("Data", "Processed", "ict_wide_prop.xlsx"))
+
 
 ```
 

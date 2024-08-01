@@ -63,7 +63,7 @@ macro_sector_mapping <- data.frame(
                   "Media & Telecommunications", "Repair of Computers & Communication Equipment")
 )
 
-
+write_xlsx(macro_sector_mapping, here("Data", "Processed", "macro_sector_mapping.xlsx"))
 ```
 
 ## Why do we aggregate into macro sectors?
@@ -153,6 +153,7 @@ ict_wide_mac_prop <- ict_summary_mac1 %>%
     values_from = proportion,       # Fill the new columns with values from 'proportion'
     values_fill = list(proportion = 0))  # Fill missing values with 0
 
+write_xlsx(ict_wide_mac_prop, here("Data", "Processed", "ict_wide_mac_prop.xlsx"))
 
 # Use kable to format the wide table for LaTeX
 kable(ict_wide_mac_prop, booktabs = TRUE) %>%

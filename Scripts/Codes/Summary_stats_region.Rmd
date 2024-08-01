@@ -119,6 +119,8 @@ ict_wide_reg_prop <- ict_summary_reg1 %>%
     values_from = proportion,       # Fill the new columns with values from 'proportion'
     values_fill = list(proportion = 0))  # Fill missing values with 0
 
+write_xlsx(ict_wide_reg_prop, here("Data", "Processed", "ict_wide_reg_prop.xlsx"))
+
 
 # Use kable to format the wide table for LaTeX
 kable(ict_wide_reg_prop, booktabs = TRUE) %>%
@@ -226,7 +228,7 @@ kable(ict_wide_mac_count, booktabs = T) %>%
 ```
 
 
-## Proportions of Firms Macro Sectors by Regions
+## Proportions of Firms by Macro Sectors by Regions
 
 
 ```{r props_by_mac_sec, echo=FALSE}
@@ -242,7 +244,7 @@ ict_wide_mac_prop <- ict_summary_mac1 %>%
     values_from = props,       # Fill the new columns with values from 'proportion'
     values_fill = list(props = 0))  # Fill missing values with 0
 
-
+write_xlsx(ict_wide_mac_prop, here("Data", "Processed", "ict_wide_mac_prop.xlsx"))
 # Use kable to format the wide table for LaTeX
 kable(ict_wide_mac_prop, booktabs = TRUE) %>%
   kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   

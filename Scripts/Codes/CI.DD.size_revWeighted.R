@@ -163,7 +163,8 @@ results_skills_2014w <- comp_index_dd_mca(data =  S_data_2014,
                                          index = "skills", 
                                          year = 2014,
                                          weights = S_data_2014$weight)
-
+FAMD()
+MCA
 eigenvalues_2014_skills
 scree_plot_2014_skills
 contrib_2014_skills_D1
