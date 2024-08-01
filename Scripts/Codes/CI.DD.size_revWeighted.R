@@ -23,6 +23,18 @@ library(reshape2)
 ##### 0.1. Load environment #####
 
 load(here("Scripts", "Environments",  "CI_DD_size_revWeighted.RData"))
+source(here("Scripts", "Functions",  "subsetting_digidivide.R"))
+source(here("Scripts", "Functions",  "comp_index_dd_mixed.R"))
+source(here("Scripts", "Functions",  "ci_factor_mixed.R"))
+source(here("Scripts", "Functions",  "ci_factor_mca.R"))
+source(here("Scripts", "Functions",  "ci_generalized_mean1.R"))
+source(here("Scripts", "Functions",  "comp_index_dd_mca.R"))
+source(here("Scripts", "Functions",  "compare_means_ci.R"))
+source(here("Scripts", "Functions",  "myscale.R"))
+source(here("Scripts", "Functions",  "normalize_min_max.R"))
+
+
+
 # save.image("~/Library/CloudStorage/Dropbox/Tesis/2021/Italy/Urbino/Data/Repos/Clusterwise_DD_Italy/Scripts/Environments/CI_DD_size_rev.RData")
 
 #### 1. Load the ICT usage survey ##### 

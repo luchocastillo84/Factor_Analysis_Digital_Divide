@@ -42,6 +42,7 @@ library(Compind)
 library(lme4)
 library(Matrix)
 library(ltm)
+library(writexl)
 
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(echo = FALSE, warning = F, message = F )
@@ -90,6 +91,8 @@ load(here("Scripts", "Environments", "FactoAnalysisPreProcess.RData"))
 
 rownames(test_results_Access) = NULL
 
+write_xlsx(test_results_Access, here("Data", "Processed", "test_results_Access.xlsx"))
+
 kable(test_results_Access, "latex", longtable = F, booktabs = T, escape = T) %>%
   kable_styling(font_size = 6, latex_options = c("repeat_header")) %>%   pack_rows("",1,6) %>% pack_rows("",7,9)
 
@@ -102,6 +105,8 @@ kable(test_results_Access, "latex", longtable = F, booktabs = T, escape = T) %>%
 load(here("Scripts", "Environments", "FactoAnalysisPreProcess.RData"))
 
 rownames(test_results_Skills) = NULL
+
+write_xlsx(test_results_Skills, here("Data", "Processed", "test_results_Skills.xlsx"))
 
 kable(test_results_Skills, "latex", longtable = F, booktabs = T, escape = T) %>%
   kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,9) %>% pack_rows("",10,12)
@@ -116,6 +121,8 @@ kable(test_results_Skills, "latex", longtable = F, booktabs = T, escape = T) %>%
 load(here("Scripts", "Environments", "FactoAnalysisPreProcess.RData"))
 
 rownames(test_results_Usage) = NULL
+
+write_xlsx(test_results_Usage, here("Data", "Processed", "test_results_Usage.xlsx"))
 
 kable(test_results_Usage, "latex", longtable = F, booktabs = T, escape = T) %>%
   kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,11) %>% pack_rows("",12,14)
