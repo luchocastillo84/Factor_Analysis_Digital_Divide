@@ -265,13 +265,14 @@ U_data_2014[] <- lapply(U_data_2014, function(x) {
 })
 
 # Sort the column names in alphabetical order
-sorted_col_namesU14 <- sort(names(U_data_2014[, 1:14]))
+sorted_col_namesU14 <- sort(names(U_data_2014[, 1:11]))
+sorted_col_namesU14 <- c(sorted_col_namesU14, names(U_data_2014[, 12:14]))
 
 # Reorder the data frame according to the sorted column names
 U_data_2014_sorted <- U_data_2014[, sorted_col_namesU14]
 
 # Calculate the correlation matrix for the sorted columns
-cor_matrix_sortedU14 <- cor(U_data_2014_sorted, use = "complete.obs")
+cor_matrix_sortedU14 <- cor(U_data_2014, use = "complete.obs")
 
 # Plot the sorted correlation matrix
 corr_U2014 <- corrplot(cor_matrix_sortedU14, method = "square", order = "original", tl.col = "red", tl.srt = 45)
@@ -379,7 +380,8 @@ U_data_2015[] <- lapply(U_data_2015, function(x) {
 })
 
 # Sort the column names in alphabetical order
-sorted_col_namesU15 <- sort(names(U_data_2015[, 1:14]))
+sorted_col_namesU15 <- sort(names(U_data_2015[, 1:11]))
+sorted_col_namesU15 <- c(sorted_col_namesU15, names(U_data_2015[, 12:14]))
 
 # Reorder the data frame according to the sorted column names
 U_data_2015_sorted <- U_data_2015[, sorted_col_namesU15]
@@ -471,7 +473,9 @@ U_data_2016[] <- lapply(U_data_2016, function(x) {
 })
 
 # Sort the column names in alphabetical order
-sorted_col_namesU16 <- sort(names(U_data_2016[, 1:14]))
+sorted_col_namesU16 <- sort(names(U_data_2016[, 1:11]))
+sorted_col_namesU16 <- c(sorted_col_namesU16, names(U_data_2016[, 12:14]))
+
 
 # Reorder the data frame according to the sorted column names
 U_data_2016_sorted <- U_data_2016[, sorted_col_namesU16]
@@ -564,7 +568,8 @@ U_data_2017[] <- lapply(U_data_2017, function(x) {
 })
 
 # Sort the column names in alphabetical order
-sorted_col_namesU17 <- sort(names(U_data_2017[, 1:14]))
+sorted_col_namesU17 <- sort(names(U_data_2017[, 1:11]))
+sorted_col_namesU17 <- c(sorted_col_namesU17, names(U_data_2017[, 12:14]))
 
 # Reorder the data frame according to the sorted column names
 U_data_2017_sorted <- U_data_2017[, sorted_col_namesU17]
@@ -656,7 +661,8 @@ U_data_2018[] <- lapply(U_data_2018, function(x) {
 })
 
 # Sort the column names in alphabetical order
-sorted_col_namesU18 <- sort(names(U_data_2018[, 1:14]))
+sorted_col_namesU18 <- sort(names(U_data_2018[, 1:11]))
+sorted_col_namesU18 <- c(sorted_col_namesU18, names(U_data_2018[, 12:14]))
 
 # Reorder the data frame according to the sorted column names
 U_data_2018_sorted <- U_data_2018[, sorted_col_namesU18]
@@ -748,7 +754,8 @@ U_data_2019[] <- lapply(U_data_2019, function(x) {
 })
 
 # Sort the column names in alphabetical order
-sorted_col_namesU19 <- sort(names(U_data_2019[, 1:14]))
+sorted_col_namesU19 <- sort(names(U_data_2019[, 1:11]))
+sorted_col_namesU19 <- c(sorted_col_namesU19, names(U_data_2019[, 12:14]))
 
 # Reorder the data frame according to the sorted column names
 U_data_2019_sorted <- U_data_2019[, sorted_col_namesU19]
