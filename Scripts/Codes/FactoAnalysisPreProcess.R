@@ -236,7 +236,7 @@ corr_S2014 <- corrplot(cor_matrix_sortedS14, method = "square", order = "origina
 
 cont_alpha_S2014 <- results[["2014"]]$S_reliability$total
 cont_alpha_S2014 <- cont_alpha_S2014[, -c(6:9)]
-
+write_xlsx(cont_alpha_S2014, here("Data", "Processed", "cont_alpha_S2014.xlsx"))
 
 # Perform Bartlett's Test of Sphericity
 bartlett_test_S14 <- cortest.bartlett(cor_matrix_sortedS14, nrow(S_data_2014))
@@ -279,6 +279,8 @@ corr_U2014 <- corrplot(cor_matrix_sortedU14, method = "square", order = "origina
 
 cont_alpha_U2014 <- results[["2014"]]$U_reliability$total
 cont_alpha_U2014 <- cont_alpha_U2014[, -c(6:9)]
+write_xlsx(cont_alpha_U2014, here("Data", "Processed", "cont_alpha_U2014.xlsx"))
+
 
 
 # Perform Bartlett's Test of Sphericity

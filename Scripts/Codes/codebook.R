@@ -45,4 +45,4 @@ codebook <- tibble::tibble(
 )
 
 save(codebook, file = here("Data", "Processed", "codebook.rda"))
-
+write_xlsx(codebook, here("Data", "Tags", "codebook.xlsx"))

@@ -97,7 +97,7 @@ in specific years due to changes in the survey design. A composite strata variab
 # Create the table for variables with 100% missing data
 missing_100_data <- data.frame(
   Year = c("2014", "2015", "2016", "2017", "2018", "2019"),
-  "Variables_with_all_Missing_Values" = c("B5a", "-", "-", "B5a, C10a, C10c, C9g, D1, D2a, D2b", "C10a, C10c, C9g", "B5a")
+  "Variables_with_all_Missing_Values" = c("B5a", "-", "-", "B5a, C10a, C10c, C9g, D1, D2a, D2b", "    C10a, C10c, C9g", "B5a")
 )
 
 kable(missing_100_data, "latex", longtable = F, booktabs = T, escape = T) %>%

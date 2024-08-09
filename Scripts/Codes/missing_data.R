@@ -66,7 +66,7 @@ ncol(ICT_2016Rdux)
 ncol(ICT_2017Rdux)
 ncol(ICT_2018Rdux)
 ncol(ICT_2019Rdux)
-
+vis_dat(ICT_2014Rdux)
 
 
 
