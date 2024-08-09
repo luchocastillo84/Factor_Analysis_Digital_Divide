@@ -196,7 +196,7 @@ subsets_2014 <- subsetting_digidivide(data =  ict_combined1,
 
 ### Eigenvalues Access 2014
 
-```{r Access2014, echo=FALSE}
+```{r Access2014, echo=FALSE, message=FALSE, warning=FALSE}
 
 A_data_2014 <- subsets_2014$A_data
 
@@ -271,12 +271,12 @@ hist_2014_access
 
 ### Eigenvalues Skills 2014
 
-```{r Skills2014, echo=FALSE}
+```{r Skills2014, echo=FALSE, message=FALSE, warning=FALSE}
 
 S_data_2014 <- subsets_2014$S_data
 
 
-results_skills_2014w <- comp_index_dd_mixed(data =  S_data_2014, 
+results_skills_2014w <- comp_index_dd_mca(data =  S_data_2014, 
                                             index = "skills", 
                                             year = 2014,
                                             weights = S_data_2014$weight)
@@ -345,12 +345,12 @@ hist_2014_skills
 
 ### Eigenvalues Usage 2014
 
-```{r Usage2014, echo=FALSE}
+```{r Usage2014, echo=FALSE, message=FALSE, warning=FALSE}
 
 U_data_2014 <- subsets_2014$U_data
 
 
-results_usage_2014w <- comp_index_dd_mixed(data =  U_data_2014, 
+results_usage_2014w <- comp_index_dd_mca(data =  U_data_2014, 
                                             index = "usage", 
                                             year = 2014,
                                             weights = U_data_2014$weight)
@@ -439,7 +439,7 @@ subsets_2015 <- subsetting_digidivide(data =  ict_combined1,
 
 ### Eigenvalues Access 2015
 
-```{r Access2015, echo=FALSE}
+```{r Access2015, echo=FALSE, message=FALSE, warning=FALSE}
 
 A_data_2015 <- subsets_2015$A_data
 
@@ -514,12 +514,12 @@ hist_2015_access
 
 ### Eigenvalues Skills 2015
 
-```{r Skills2015, echo=FALSE}
+```{r Skills2015, echo=FALSE, message=FALSE, warning=FALSE}
 
 S_data_2015 <- subsets_2015$S_data
 
 
-results_skills_2015w <- comp_index_dd_mixed(data =  S_data_2015, 
+results_skills_2015w <- comp_index_dd_mca(data =  S_data_2015, 
                                             index = "skills", 
                                             year = 2015,
                                             weights = S_data_2015$weight)
@@ -588,12 +588,12 @@ hist_2015_skills
 
 ### Eigenvalues Usage 2015
 
-```{r Usage2015, echo=FALSE}
+```{r Usage2015, echo=FALSE, message=FALSE, warning=FALSE}
 
 U_data_2015 <- subsets_2015$U_data
 
 
-results_usage_2015w <- comp_index_dd_mixed(data =  U_data_2015, 
+results_usage_2015w <- comp_index_dd_mca(data =  U_data_2015, 
                                            index = "usage", 
                                            year = 2015,
                                            weights = U_data_2015$weight)
@@ -682,7 +682,7 @@ subsets_2016 <- subsetting_digidivide(data =  ict_combined1,
 
 ### Eigenvalues Access 2016
 
-```{r Access2016, echo=FALSE}
+```{r Access2016, echo=FALSE, message=FALSE, warning=FALSE}
 
 A_data_2016 <- subsets_2016$A_data
 
@@ -757,12 +757,12 @@ hist_2016_access
 
 ### Eigenvalues Skills 2016
 
-```{r Skills2016, echo=FALSE}
+```{r Skills2016, echo=FALSE, message=FALSE, warning=FALSE}
 
 S_data_2016 <- subsets_2016$S_data
 
 
-results_skills_2016w <- comp_index_dd_mixed(data =  S_data_2016, 
+results_skills_2016w <- comp_index_dd_mca(data =  S_data_2016, 
                                             index = "skills", 
                                             year = 2016,
                                             weights = S_data_2016$weight)
@@ -831,12 +831,12 @@ hist_2016_skills
 
 ### Eigenvalues Usage 2016
 
-```{r Usage2016, echo=FALSE}
+```{r Usage2016, echo=FALSE, message=FALSE, warning=FALSE}
 
 U_data_2016 <- subsets_2016$U_data
 
 
-results_usage_2016w <- comp_index_dd_mixed(data =  U_data_2016, 
+results_usage_2016w <- comp_index_dd_mca(data =  U_data_2016, 
                                            index = "usage", 
                                            year = 2016,
                                            weights = U_data_2016$weight)
@@ -925,7 +925,7 @@ subsets_2017 <- subsetting_digidivide(data =  ict_combined1,
 
 ### Eigenvalues Access 2017
 
-```{r Access2017, echo=FALSE}
+```{r Access2017, echo=FALSE, message=FALSE, warning=FALSE}
 
 A_data_2017 <- subsets_2017$A_data
 
@@ -1000,12 +1000,12 @@ hist_2017_access
 
 ### Eigenvalues Skills 2017
 
-```{r Skills2017, echo=FALSE}
+```{r Skills2017, echo=FALSE, message=FALSE, warning=FALSE}
 
 S_data_2017 <- subsets_2017$S_data
 
 
-results_skills_2017w <- comp_index_dd_mixed(data =  S_data_2017, 
+results_skills_2017w <- comp_index_dd_mca(data =  S_data_2017, 
                                             index = "skills", 
                                             year = 2017,
                                             weights = S_data_2017$weight)
@@ -1074,12 +1074,12 @@ hist_2017_skills
 
 ### Eigenvalues Usage 2017
 
-```{r Usage2017, echo=FALSE}
+```{r Usage2017, echo=FALSE, message=FALSE, warning=FALSE}
 
 U_data_2017 <- subsets_2017$U_data
 
 
-results_usage_2017w <- comp_index_dd_mixed(data =  U_data_2017, 
+results_usage_2017w <- comp_index_dd_mca(data =  U_data_2017, 
                                            index = "usage", 
                                            year = 2017,
                                            weights = U_data_2017$weight)
@@ -1168,7 +1168,7 @@ subsets_2018 <- subsetting_digidivide(data =  ict_combined1,
 
 ### Eigenvalues Access 2018
 
-```{r Access2018, echo=FALSE}
+```{r Access2018, echo=FALSE, message=FALSE, warning=FALSE}
 
 A_data_2018 <- subsets_2018$A_data
 
@@ -1243,12 +1243,12 @@ hist_2018_access
 
 ### Eigenvalues Skills 2018
 
-```{r Skills2018, echo=FALSE}
+```{r Skills2018, echo=FALSE, message=FALSE, warning=FALSE}
 
 S_data_2018 <- subsets_2018$S_data
 
 
-results_skills_2018w <- comp_index_dd_mixed(data =  S_data_2018, 
+results_skills_2018w <- comp_index_dd_mca(data =  S_data_2018, 
                                             index = "skills", 
                                             year = 2018,
                                             weights = S_data_2018$weight)
@@ -1317,12 +1317,12 @@ hist_2018_skills
 
 ### Eigenvalues Usage 2018
 
-```{r Usage2018, echo=FALSE}
+```{r Usage2018, echo=FALSE, message=FALSE, warning=FALSE}
 
 U_data_2018 <- subsets_2018$U_data
 
 
-results_usage_2018w <- comp_index_dd_mixed(data =  U_data_2018, 
+results_usage_2018w <- comp_index_dd_mca(data =  U_data_2018, 
                                            index = "usage", 
                                            year = 2018,
                                            weights = U_data_2018$weight)
@@ -1411,7 +1411,7 @@ subsets_2019 <- subsetting_digidivide(data =  ict_combined1,
 
 ### Eigenvalues Access 2019
 
-```{r Access2019, echo=FALSE}
+```{r Access2019, echo=FALSE, message=FALSE, warning=FALSE}
 
 A_data_2019 <- subsets_2019$A_data
 
@@ -1486,12 +1486,12 @@ hist_2019_access
 
 ### Eigenvalues Skills 2019
 
-```{r Skills2019, echo=FALSE}
+```{r Skills2019, echo=FALSE, message=FALSE, warning=FALSE}
 
 S_data_2019 <- subsets_2019$S_data
 
 
-results_skills_2019w <- comp_index_dd_mixed(data =  S_data_2019, 
+results_skills_2019w <- comp_index_dd_mca(data =  S_data_2019, 
                                             index = "skills", 
                                             year = 2019,
                                             weights = S_data_2019$weight)
@@ -1560,12 +1560,12 @@ hist_2019_skills
 
 ### Eigenvalues Usage 2019
 
-```{r Usage2019, echo=FALSE}
+```{r Usage2019, echo=FALSE, message=FALSE, warning=FALSE}
 
 U_data_2019 <- subsets_2019$U_data
 
 
-results_usage_2019w <- comp_index_dd_mixed(data =  U_data_2019, 
+results_usage_2019w <- comp_index_dd_mca(data =  U_data_2019, 
                                            index = "usage", 
                                            year = 2019,
                                            weights = U_data_2019$weight)
