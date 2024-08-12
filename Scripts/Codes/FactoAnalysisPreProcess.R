@@ -272,7 +272,7 @@ sorted_col_namesU14 <- c(sorted_col_namesU14, names(U_data_2014[, 12:14]))
 U_data_2014_sorted <- U_data_2014[, sorted_col_namesU14]
 
 # Calculate the correlation matrix for the sorted columns
-cor_matrix_sortedU14 <- cor(U_data_2014, use = "complete.obs")
+cor_matrix_sortedU14 <- cor(U_data_2014_sorted, use = "complete.obs")
 
 # Plot the sorted correlation matrix
 corr_U2014 <- corrplot(cor_matrix_sortedU14, method = "square", order = "original", tl.col = "red", tl.srt = 45)

@@ -47,7 +47,7 @@ source(here("Scripts", "Functions", "yearly_stats_and_plot.R"))
 
 ```{r long_code, include=FALSE}
 
-load(here("Data", "Processed", "CI_DD_comb_rev_weightedS11.rda")) ### Presented in Urbino
+load(here("Data", "Processed", "CI_DD_comb_rev_weighted.rda")) ### Presented in Urbino
 
 ci_dd_combined_rev <- ci_dd_combined_weighted
 
@@ -171,6 +171,32 @@ line_plot_by_region <- yearly_stats_and_plot(combined_data_harmonized,
 
 ## Access
 
+### Summary Statistics
+
+```{r SumStatsA, echo=FALSE}
+
+# Calculate summary statistics for access_n and secDD_n by year and size
+summary_stats_A <- combined_data_harmonized %>%
+  group_by(year) %>%  # Ensure grouping by both year and size if needed
+  summarise(
+    across(c(access_n),
+           list(mean = ~round(mean(.), 3),
+                sd = ~round(sd(.), 3),
+                q1 = ~round(quantile(., 0.25), 3),
+                median = ~round(median(.), 3),
+                q3 = ~round(quantile(., 0.75), 3)),
+           .names = "{.col}_{.fn}")) %>%
+  ungroup()
+
+kable(summary_stats_A, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,6)
+
+
+```
+
+
+##
+
 ```{r hist_A, echo=FALSE}
 
 p1_access
@@ -179,6 +205,32 @@ p1_access
 
 ## Skills
 
+### Summary Statistics
+
+```{r SumStatsS, echo=FALSE}
+
+# Calculate summary statistics for access_n and secDD_n by year and size
+summary_stats_S <- combined_data_harmonized %>%
+  group_by(year) %>%  # Ensure grouping by both year and size if needed
+  summarise(
+    across(c(skills_n),
+           list(mean = ~round(mean(.), 3),
+                sd = ~round(sd(.), 3),
+                q1 = ~round(quantile(., 0.25), 3),
+                median = ~round(median(.), 3),
+                q3 = ~round(quantile(., 0.75), 3)),
+           .names = "{.col}_{.fn}")) %>%
+  ungroup()
+
+kable(summary_stats_S, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,6)
+
+
+```
+
+
+##
+
 ```{r hist_S, echo=FALSE}
 
 p2_skills
@@ -186,6 +238,32 @@ p2_skills
 ```
 
 ## Usage
+
+### Summary Statistics
+
+```{r SumStatsU, echo=FALSE}
+
+# Calculate summary statistics for access_n and secDD_n by year and size
+summary_stats_U <- combined_data_harmonized %>%
+  group_by(year) %>%  # Ensure grouping by both year and size if needed
+  summarise(
+    across(c(usage_n),
+           list(mean = ~round(mean(.), 3),
+                sd = ~round(sd(.), 3),
+                q1 = ~round(quantile(., 0.25), 3),
+                median = ~round(median(.), 3),
+                q3 = ~round(quantile(., 0.75), 3)),
+           .names = "{.col}_{.fn}")) %>%
+  ungroup()
+
+kable(summary_stats_U, "latex", longtable = F, booktabs = T, escape = T) %>%
+  kable_styling(font_size = 6, latex_options = c("repeat_header"))  %>%   pack_rows("",1,6)
+
+
+```
+
+
+##
 
 ```{r hist_U, echo=FALSE}
 

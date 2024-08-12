@@ -31,7 +31,8 @@ source(here("Scripts", "Functions",  "ci_generalized_mean1.R"))
 source(here("Scripts", "Functions",  "comp_index_dd_mca.R"))
 source(here("Scripts", "Functions",  "compare_means_ci.R"))
 source(here("Scripts", "Functions",  "myscale.R"))
-source(here("Scripts", "Functions",  "normalize_min_max.R"))
+source(here("Scripts", "Functions",  "norm_min_max.R"))
+source(here("Scripts", "Functions", "binding_comp_index_dd.R"))
 
 
 
@@ -46,7 +47,7 @@ summary(ict_combined)
 ict_combined$A2_A2 <- ict_combined$A2_A2/ 100
 ict_combined$A2_C2 <- ict_combined$A2_C2/ 100
 ict_combined$A2_C6 <- ict_combined$A2_C6/ 100
-vis_miss(ict_combined, warn_large_data = F)
+vis_miss(ict_combined, warn_large_data = F, facet = year)
 
 summary(ict_combined$A2_C2)
 
@@ -315,11 +316,12 @@ subsets_2016 <- subsetting_digidivide(data = ict_combined1,
                                       var2encode =  var2encode, 
                                       year =  year,
                                       include_weights = T)
-summary(U_data_2016)
+
 
 A_data_2016 <- subsets_2016$A_data
 S_data_2016 <- subsets_2016$S_data
 U_data_2016 <- subsets_2016$U_data
+summary(U_data_2016)
 
 ##### 4.1. ACCESS 2016 ##### 
 

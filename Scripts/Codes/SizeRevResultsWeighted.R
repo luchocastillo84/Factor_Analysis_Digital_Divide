@@ -29,7 +29,6 @@ library(ggpubr)
 library(stargazer)
 
 #### 0. Loading the environment and data ####
-
 source(here("Scripts", "Functions", "create_summary_table.R"))
 source(here("Scripts", "Functions", "yearly_stats_and_plot.R"))
 # source(here("Scripts", "Functions", "ci_factor_mixed.R"))
@@ -72,18 +71,51 @@ summary(combined_data_harmonized)
 
 summary_table <- create_summary_table(ci_dd_combined_rev)
 
-# # Calculate summary statistics for access_n and secDD_n by year and size 
-# summary_stats <- combined_data_harmonized %>%
-#   group_by(year) %>%  # Ensure grouping by both year and size if needed
-#   summarise(
-#     across(c(access_n, secDD_n), 
-#            list(mean = ~round(mean(.), 3),
-#                 sd = ~round(sd(.), 3),
-#                 q1 = ~round(quantile(., 0.25), 3),
-#                 median = ~round(median(.), 3),
-#                 q3 = ~round(quantile(., 0.75), 3)), 
-#            .names = "{.col}_{.fn}")) %>%
-#   ungroup()
+# Calculate summary statistics for access
+summary_statsA <- combined_data_harmonized %>%
+  group_by(year) %>%  # Ensure grouping by both year and size if needed
+  summarise(
+    across(c(access_n),
+           list(mean = ~round(mean(.), 3),
+                sd = ~round(sd(.), 3),
+                q1 = ~round(quantile(., 0.25), 3),
+                median = ~round(median(.), 3),
+                q3 = ~round(quantile(., 0.75), 3)),
+           .names = "{.col}_{.fn}")) %>%
+  ungroup()
+
+write_xlsx(summary_statsA, here("Data", "Processed", "summary_statsA.xlsx"))
+
+# Calculate summary statistics for skills
+summary_stats_S <- combined_data_harmonized %>%
+  group_by(year) %>%  # Ensure grouping by both year and size if needed
+  summarise(
+    across(c(skills_n),
+           list(mean = ~round(mean(.), 3),
+                sd = ~round(sd(.), 3),
+                q1 = ~round(quantile(., 0.25), 3),
+                median = ~round(median(.), 3),
+                q3 = ~round(quantile(., 0.75), 3)),
+           .names = "{.col}_{.fn}")) %>%
+  ungroup()
+
+write_xlsx(summary_stats_S, here("Data", "Processed", "summary_statsS.xlsx"))
+
+# Calculate summary statistics for usage
+summary_stats_U <- combined_data_harmonized %>%
+  group_by(year) %>%  # Ensure grouping by both year and size if needed
+  summarise(
+    across(c(usage_n),
+           list(mean = ~round(mean(.), 3),
+                sd = ~round(sd(.), 3),
+                q1 = ~round(quantile(., 0.25), 3),
+                median = ~round(median(.), 3),
+                q3 = ~round(quantile(., 0.75), 3)),
+           .names = "{.col}_{.fn}")) %>%
+  ungroup()
+
+write_xlsx(summary_stats_U, here("Data", "Processed", "summary_statsU.xlsx"))
+
 
 #### 2. Individual representation of the histograms ####
 
