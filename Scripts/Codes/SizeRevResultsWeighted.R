@@ -38,7 +38,7 @@ source(here("Scripts", "Functions", "yearly_stats_and_plot.R"))
 # load(here("Scripts", "Environments",  "size_rev_results_weighted.RData"))
 
 
-# load(here("Data", "Processed", "CI_DD_comb_rev_weighted.rda"))
+load(here("Data", "Processed", "CI_DD_comb_rev_weighted.rda"))
 load(here("Data", "Processed", "CI_DD_comb_rev_weightedS11.rda")) ### Presented in Urbino
 
 # load(here("Scripts", "Environments",  "WeightingSchemes.RData"))
@@ -154,7 +154,9 @@ p2_secDD <- ggplot(combined_data_harmonized, aes(x = secDD_n)) +
   ggtitle("Histogram of Skills & Usage") +
   xlab("Skills & Usage") +
   ylab("Frequency") +
-  facet_wrap(~ year, scales = "fixed")
+  facet_wrap(~ year, scales = "fixed") +
+  theme(panel.spacing = unit(2 , "lines")  # Increase the spacing between facets
+  )
 p2_secDD
 
 

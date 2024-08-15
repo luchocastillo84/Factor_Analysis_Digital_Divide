@@ -184,8 +184,9 @@ yearly_stats_and_plot <- function(data, line_vars, group_var = NULL, statistic =
       plot.title = element_text(size = title_size, face = "bold"),
       strip.text = element_text(size = strip_size),
       legend.title = element_text(size = legend_size),
-      legend.text = element_text(size = legend_size)
-    )
+      legend.text = element_text(size = legend_size),
+      panel.spacing = unit(1, "cm", data = NULL)  # Increase the spacing between facets
+    ) 
   
   # Add facet_wrap conditionally
   if (!is.null(group_var)) {
